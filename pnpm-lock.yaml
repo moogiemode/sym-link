@@ -8,16 +8,25 @@ importers:
 
   .:
     dependencies:
+      immer:
+        specifier: ^10.1.1
+        version: 10.1.1
       react:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      zustand:
+        specifier: ^5.0.2
+        version: 5.0.2(@types/react@18.3.13)(immer@10.1.1)(react@18.3.1)
     devDependencies:
       '@eslint/js':
         specifier: ^9.15.0
         version: 9.16.0
+      '@tauri-apps/cli':
+        specifier: ^2.1.0
+        version: 2.1.0
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.1
@@ -477,6 +486,71 @@ packages:
   '@swc/types@0.1.17':
     resolution: {integrity: sha512-V5gRru+aD8YVyCOMAjMpWR1Ui577DD5KSJsHP8RAxopAH22jFz6GZd/qxqjO6MJHQhcsjvjOFXyDhyLQUnMveQ==}
 
+  '@tauri-apps/cli-darwin-arm64@2.1.0':
+    resolution: {integrity: sha512-ESc6J6CE8hl1yKH2vJ+ALF+thq4Be+DM1mvmTyUCQObvezNCNhzfS6abIUd3ou4x5RGH51ouiANeT3wekU6dCw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@tauri-apps/cli-darwin-x64@2.1.0':
+    resolution: {integrity: sha512-TasHS442DFs8cSH2eUQzuDBXUST4ECjCd0yyP+zZzvAruiB0Bg+c8A+I/EnqCvBQ2G2yvWLYG8q/LI7c87A5UA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@tauri-apps/cli-linux-arm-gnueabihf@2.1.0':
+    resolution: {integrity: sha512-aP7ZBGNL4ny07Cbb6kKpUOSrmhcIK2KhjviTzYlh+pPhAptxnC78xQGD3zKQkTi2WliJLPmBYbOHWWQa57lQ9w==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [linux]
+
+  '@tauri-apps/cli-linux-arm64-gnu@2.1.0':
+    resolution: {integrity: sha512-ZTdgD5gLeMCzndMT2f358EkoYkZ5T+Qy6zPzU+l5vv5M7dHVN9ZmblNAYYXmoOuw7y+BY4X/rZvHV9pcGrcanQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@tauri-apps/cli-linux-arm64-musl@2.1.0':
+    resolution: {integrity: sha512-NzwqjUCilhnhJzusz3d/0i0F1GFrwCQbkwR6yAHUxItESbsGYkZRJk0yMEWkg3PzFnyK4cWTlQJMEU52TjhEzA==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@tauri-apps/cli-linux-x64-gnu@2.1.0':
+    resolution: {integrity: sha512-TyiIpMEtZxNOQmuFyfJwaaYbg3movSthpBJLIdPlKxSAB2BW0VWLY3/ZfIxm/G2YGHyREkjJvimzYE0i37PnMA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@tauri-apps/cli-linux-x64-musl@2.1.0':
+    resolution: {integrity: sha512-/dQd0TlaxBdJACrR72DhynWftzHDaX32eBtS5WBrNJ+nnNb+znM3gON6nJ9tSE9jgDa6n1v2BkI/oIDtypfUXw==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@tauri-apps/cli-win32-arm64-msvc@2.1.0':
+    resolution: {integrity: sha512-NdQJO7SmdYqOcE+JPU7bwg7+odfZMWO6g8xF9SXYCMdUzvM2Gv/AQfikNXz5yS7ralRhNFuW32i5dcHlxh4pDg==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@tauri-apps/cli-win32-ia32-msvc@2.1.0':
+    resolution: {integrity: sha512-f5h8gKT/cB8s1ticFRUpNmHqkmaLutT62oFDB7N//2YTXnxst7EpMIn1w+QimxTvTk2gcx6EcW6bEk/y2hZGzg==}
+    engines: {node: '>= 10'}
+    cpu: [ia32]
+    os: [win32]
+
+  '@tauri-apps/cli-win32-x64-msvc@2.1.0':
+    resolution: {integrity: sha512-P/+LrdSSb5Xbho1LRP4haBjFHdyPdjWvGgeopL96OVtrFpYnfC+RctB45z2V2XxqFk3HweDDxk266btjttfjGw==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [win32]
+
+  '@tauri-apps/cli@2.1.0':
+    resolution: {integrity: sha512-K2VhcKqBhAeS5pNOVdnR/xQRU6jwpgmkSL2ejHXcl0m+kaTggT0WRDQnFtPq6NljA7aE03cvwsbCAoFG7vtkJw==}
+    engines: {node: '>= 10'}
+    hasBin: true
+
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
@@ -878,6 +952,9 @@ packages:
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
+
+  immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
   import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -1341,6 +1418,24 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zustand@5.0.2:
+    resolution: {integrity: sha512-8qNdnJVJlHlrKXi50LDqqUNmUbuBjoKLrYQBnoChIbVph7vni+sY+YpvdjXG9YLd/Bxr6scMcR+rm5H3aSqPaw==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -1617,6 +1712,49 @@ snapshots:
   '@swc/types@0.1.17':
     dependencies:
       '@swc/counter': 0.1.3
+
+  '@tauri-apps/cli-darwin-arm64@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-darwin-x64@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-linux-arm-gnueabihf@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-linux-arm64-gnu@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-linux-arm64-musl@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-linux-x64-gnu@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-linux-x64-musl@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-win32-arm64-msvc@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-win32-ia32-msvc@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli-win32-x64-msvc@2.1.0':
+    optional: true
+
+  '@tauri-apps/cli@2.1.0':
+    optionalDependencies:
+      '@tauri-apps/cli-darwin-arm64': 2.1.0
+      '@tauri-apps/cli-darwin-x64': 2.1.0
+      '@tauri-apps/cli-linux-arm-gnueabihf': 2.1.0
+      '@tauri-apps/cli-linux-arm64-gnu': 2.1.0
+      '@tauri-apps/cli-linux-arm64-musl': 2.1.0
+      '@tauri-apps/cli-linux-x64-gnu': 2.1.0
+      '@tauri-apps/cli-linux-x64-musl': 2.1.0
+      '@tauri-apps/cli-win32-arm64-msvc': 2.1.0
+      '@tauri-apps/cli-win32-ia32-msvc': 2.1.0
+      '@tauri-apps/cli-win32-x64-msvc': 2.1.0
 
   '@types/estree@1.0.6': {}
 
@@ -2065,6 +2203,8 @@ snapshots:
 
   ignore@5.3.2: {}
 
+  immer@10.1.1: {}
+
   import-fresh@3.3.0:
     dependencies:
       parent-module: 1.0.1
@@ -2481,3 +2621,9 @@ snapshots:
   yaml@2.6.1: {}
 
   yocto-queue@0.1.0: {}
+
+  zustand@5.0.2(@types/react@18.3.13)(immer@10.1.1)(react@18.3.1):
+    optionalDependencies:
+      '@types/react': 18.3.13
+      immer: 10.1.1
+      react: 18.3.1
