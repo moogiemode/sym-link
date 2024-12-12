@@ -2,5 +2,8 @@
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx,js,jsx}'],
   theme: { extend: {} },
-  plugins: [require('daisyui')],
+  plugins: [require('@tailwindcss/typography'), require('daisyui')],
+  daisyui: {
+    themes: ['dark'],
+  },
 };
