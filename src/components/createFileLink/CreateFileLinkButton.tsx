@@ -1,4 +1,4 @@
-import { CreateFileLinkSteps } from './CreateFileLinkSteps';
+import { CreateFileLinkSteps } from "./CreateFileLinkSteps";
 
 export const CreateFileLinkButton = () => {
   const openModal = () => (document.getElementById('create-new-link-modal') as HTMLFormElement).showModal();

@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import './App.css';
-import { CreateFileLinkButton } from './components/CreateFileLinkButton';
+import { CreateFileLinkButton } from './components/createFileLink/CreateFileLinkButton';
 
 function App() {
-  const [count, setCount] = useState(0);
 
   return (
     <>
