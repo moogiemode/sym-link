@@ -12,6 +12,5 @@ export interface ISourceOutputFoldersContent {
 }
 
 export interface IIconProps {
-  size?: number;
   className?: React.SVGProps<SVGSVGElement>['className'];
 }

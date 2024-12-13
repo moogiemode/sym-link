@@ -30,7 +30,7 @@ export const CreateFileLinkStepsSelectTable: FC<CreateFileLinkStepsSelectTablePr
           <tr>
             <th className="w-8">
               <label>
-                <input type="checkbox" className="checkbox checkbox-sm" defaultChecked={selectedFiles.size > 0} onChange={e => handleSelectAll(e.target.checked)} />
+                <input type="checkbox" className="checkbox checkbox-sm checked:checkbox-accent" defaultChecked={selectedFiles.size > 0} onChange={e => handleSelectAll(e.target.checked)} />
               </label>
             </th>
             <th>Name</th>

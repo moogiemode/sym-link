@@ -14,8 +14,8 @@ export const CreateFileLinkStepsSelectTableRow: FC<CreateFileLinkStepsSelectTabl
   return (
     <tr>
       <th>
-        <label>
-          <input type="checkbox" className="checkbox checkbox-sm" onChange={e => onChange(e.target.checked)} disabled={disableCheckbox} checked={checked} />
+        <label className={disableCheckbox ? 'tooltip tooltip-right tooltip-error' : undefined} data-tip={disableCheckbox ? 'Already exists in the destination folder' : undefined}>
+          <input type="checkbox" className="checkbox checkbox-sm checked:checkbox-accent" onChange={e => onChange(e.target.checked)} disabled={disableCheckbox} checked={checked} />
         </label>
       </th>
       <td>
