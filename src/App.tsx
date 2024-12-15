@@ -1,8 +1,8 @@
 import './App.css';
 import { CreateFileLinkButton } from './components/createFileLink/CreateFileLinkButton';
 
-function App() {
 
+function App() {
   return (
     <>
       <CreateFileLinkButton />
