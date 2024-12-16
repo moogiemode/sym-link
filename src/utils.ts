@@ -1,7 +1,7 @@
 import { join } from '@tauri-apps/api/path';
-import { readDir } from '@tauri-apps/plugin-fs';
+import { DirEntry } from '@tauri-apps/plugin-fs';
 import { family } from '@tauri-apps/plugin-os';
-import { Command } from '@tauri-apps/plugin-shell';
+import { ChildProcess, Command } from '@tauri-apps/plugin-shell';
 
 export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
   return array.reduce(
@@ -14,23 +14,19 @@ export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
   );
 }
 
-
-export const createSymLink = async (sourceDir: string, outputDir: string) => {
+// POTENTIAL FOR OPTIMIZATION AS LARGE NUMBER OF FILES MAY REACH THE LIMIT. SUGGESTION - USE BATCHES OF 100 FILES
+export const createSymLinks = async (sourceDir: string, outputDir: string, filesToLink: DirEntry[]) => {
   const osFamily = family();
-  const cmd = osFamily === 'windows' ? 'symlink-windows' : 'symlink-unix';
 
-  const sourceDirItems = await readDir(sourceDir);
-  // const result = await Command.create('exec-sh', ['-c', "echo 'Hello World!'"]).execute();
-  // console.log(result);
+  const commands: Promise<ChildProcess<string>>[] = [];
 
-  for (const dirItem of sourceDirItems) {
-    // const argsArr = [await join(sourceDir, dirItem.name), await join(outputDir, dirItem.name)];
-
-    // if (dirItem.isDirectory || osFamily === 'unix') argsArr.unshift(osFamily === 'unix' ? '-s' : '/D');
+  for (const file of filesToLink) {
     if (osFamily === 'unix') {
-      await Command.create('exec-sh', ['-c', `ln -s "${await join(sourceDir, dirItem.name)}" "${await join(outputDir, dirItem.name)}"`]).execute();
+      commands.push(Command.create('exec-sh', ['-c', `ln -s "${await join(sourceDir, file.name)}" "${await join(outputDir, file.name)}"`]).execute());
     } else if (osFamily === 'windows') {
-      await Command.create('exec-cmd', ['/c', `mklink${dirItem.isDirectory ? ' /D' : ''} "${await join(outputDir, dirItem.name)}" "${await join(sourceDir, dirItem.name)}"`]).execute();
+      commands.push(Command.create('exec-cmd', ['/c', `mklink${file.isDirectory ? ' /D' : ''} "${await join(outputDir, file.name)}" "${await join(sourceDir, file.name)}"`]).execute());
     }
   }
+
+  await Promise.all(commands);
 };

@@ -5,12 +5,13 @@ import { StepsNavButtons } from './StepsNavButtons';
 
 interface CreateFileLinkStepsOutputProps {
   sourceDir: string;
+  outputDir: string;
   setOutputDir: (value: string) => void;
   changeStep: (step: 'next' | 'prev') => void;
 }
 
-export const CreateFileLinkStepsOutput: FC<CreateFileLinkStepsOutputProps> = ({ setOutputDir, changeStep, sourceDir }) => {
-  const [value, setValue] = useState('');
+export const CreateFileLinkStepsOutput: FC<CreateFileLinkStepsOutputProps> = ({ setOutputDir, changeStep, sourceDir, outputDir }) => {
+  const [value, setValue] = useState(outputDir);
 
   const handleNext = async () => {
     if (value === sourceDir) {
@@ -23,12 +24,13 @@ export const CreateFileLinkStepsOutput: FC<CreateFileLinkStepsOutputProps> = ({ 
       alert('The output directory does not exist. Please enter a valid directory.');
       return;
     }
-    
+
     setOutputDir(value);
     changeStep('next');
   };
 
   const handlePrev = () => {
+    setOutputDir(value);
     changeStep('prev');
   };
 

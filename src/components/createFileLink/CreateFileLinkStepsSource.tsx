@@ -6,10 +6,11 @@ import { StepsNavButtons } from './StepsNavButtons';
 interface CreateFileLinkStepsSourceProps {
   setSourceDir: (value: string) => void;
   changeStep: (step: 'next' | 'prev') => void;
+  sourceDir: string;
 }
 
-export const CreateFileLinkStepsSource: FC<CreateFileLinkStepsSourceProps> = ({ setSourceDir, changeStep }) => {
-  const [value, setValue] = useState('');
+export const CreateFileLinkStepsSource: FC<CreateFileLinkStepsSourceProps> = ({ setSourceDir, changeStep, sourceDir }) => {
+  const [value, setValue] = useState(sourceDir);
 
   const handleNext = async () => {
     const dirExists = await exists(value);
@@ -17,7 +18,7 @@ export const CreateFileLinkStepsSource: FC<CreateFileLinkStepsSourceProps> = ({ 
       alert('The source directory does not exist. Please enter a valid directory.');
       return;
     }
-    
+
     setSourceDir(value);
     changeStep('next');
   };

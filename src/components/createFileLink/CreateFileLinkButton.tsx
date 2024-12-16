@@ -1,7 +1,12 @@
-import { CreateFileLinkSteps } from "./CreateFileLinkSteps";
+import { useState } from 'react';
+import { CreateFileLinkSteps } from './CreateFileLinkSteps';
 
 export const CreateFileLinkButton = () => {
-  const openModal = () => (document.getElementById('create-new-link-modal') as HTMLFormElement).showModal();
+  const [modalId, setModalId] = useState(0);
+  const openModal = () => {
+    setModalId(prev => prev + 1);
+    (document.getElementById('create-new-link-modal') as HTMLFormElement).showModal();
+  };
 
   return (
     <>
@@ -9,11 +14,11 @@ export const CreateFileLinkButton = () => {
         Create New Link
       </button>
       <dialog id="create-new-link-modal" className="modal">
-        <div className="modal-box p-8">
+        <div className="modal-box p-8 overflow-hidden max-h-[80%]">
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 focus:outline-none">✕</button>
           </form>
-          <CreateFileLinkSteps />
+          <CreateFileLinkSteps key={modalId} />
         </div>
         <form method="dialog" className="modal-backdrop">
           <button>close</button>
