@@ -5,7 +5,7 @@ import { load } from '@tauri-apps/plugin-store';
 const settings = await load('settings.json', { autoSave: false });
 
 const saveLinkInfoToSettings = async (sourceDir: string, outputDir: string, filesToLink: DirEntry[]) => {
-  const newLinkedFilesEntry = { [[sourceDir, outputDir].join(':')]: filesToLink.map(f => f.name) };
+  const newLinkedFilesEntry = { [[sourceDir, outputDir, Date.now()].join(':')]: filesToLink.map(f => f.name) };
   const linkedFiles = (await settings.get('linkedFiles')) as { [n: string]: string[] };
   settings.set('linkedFiles', { ...linkedFiles, ...newLinkedFilesEntry });
   settings.save();
@@ -15,6 +15,7 @@ interface SavedLinkedFiles {
   key: string;
   sourceDir: string;
   outputDir: string;
+  timeSynced: number;
   files: FileInfo[];
 }
 
@@ -29,11 +30,11 @@ const getSavedLinkedFiles = async () => {
 };
 
 const buildFromKeyValue: (key: string, value: string[]) => Promise<SavedLinkedFiles> = async (key, value) => {
-  const [sourceDir, outputDir] = key.split(':');
+  const [sourceDir, outputDir, timeSynced] = key.split(':');
 
   const files: FileInfo[] = await Promise.all(value.map(async fileName => await stat(await join(sourceDir, fileName))));
 
-  return { key, sourceDir, outputDir, files };
+  return { key, sourceDir, outputDir, files, timeSynced: Number(timeSynced) };
 };
 
 export { getSavedLinkedFiles, saveLinkInfoToSettings, settings };
