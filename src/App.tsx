@@ -1,6 +1,5 @@
-import './App.css';
 import { CreateFileLinkButton } from './components/createFileLink/CreateFileLinkButton';
-
+import './init.ts';
 
 function App() {
   return (

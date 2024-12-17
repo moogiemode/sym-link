@@ -14,7 +14,7 @@ export const CreateFileLinkButton = () => {
         Create New Link
       </button>
       <dialog id="create-new-link-modal" className="modal">
-        <div className="modal-box p-8 overflow-hidden max-h-[80%]">
+        <div className="modal-box p-8 overflow-hidden  flex flex-col gap-8 h-full">
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 focus:outline-none">✕</button>
           </form>

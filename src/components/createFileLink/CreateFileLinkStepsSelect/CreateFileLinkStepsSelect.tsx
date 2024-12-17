@@ -1,5 +1,5 @@
 import { ISourceOutputFoldersContent } from '@/types';
-import { arrayToObject } from '@/utils';
+import { arrayToObject, filesToIgnore } from '@/utils';
 import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { FC, useEffect, useRef, useState } from 'react';
 import { ModalTopSectionContainer } from '../ModalTopSectionContainer';
@@ -26,7 +26,16 @@ export const CreateFileLinkStepsSelect: FC<CreateFileLinkStepsSelectProps> = ({ 
       const sourceFiles = readDir(sourceDir);
       const outputFiles = readDir(outputDir);
       Promise.all([sourceFiles, outputFiles]).then(values => {
-        const dirFiles = { sourceDirFiles: arrayToObject(values[0], 'name'), outputDirFiles: arrayToObject(values[1], 'name') };
+        const dirFiles = {
+          sourceDirFiles: arrayToObject(
+            values[0].filter(file => !filesToIgnore.has(file.name)),
+            'name',
+          ),
+          outputDirFiles: arrayToObject(
+            values[1].filter(file => !filesToIgnore.has(file.name)),
+            'name',
+          ),
+        };
         setDirectoryFiles(dirFiles);
 
         const selectableFiles = new Set(Object.keys(dirFiles.sourceDirFiles).filter(f => !dirFiles.outputDirFiles[f]));

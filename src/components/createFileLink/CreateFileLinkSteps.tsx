@@ -36,8 +36,8 @@ export const CreateFileLinkSteps: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8 overflow-hidden h-full max-h-full">
-      <ul className="steps">
+    <>
+      <ul className="steps modal-top">
         {steps.map((step, idx) => (
           <li key={idx} data-content={getDataContent(step, idx, currentStep)} className={`step w-24${idx <= currentStep ? ' step-accent' : ''}`}>
             {step.label}
@@ -49,11 +49,11 @@ export const CreateFileLinkSteps: FC = () => {
       ) : currentStep === 1 ? (
         <CreateFileLinkStepsOutput setOutputDir={setOutputValue} changeStep={changeStep} sourceDir={sourceValue} outputDir={outputValue} />
       ) : currentStep === 2 ? (
-        <CreateFileLinkStepsSelect sourceDir={sourceValue} outputDir={outputValue} setFilesToLink={setFilesToLink} changeStep={changeStep} filesToLink={filesToLink}/>
+        <CreateFileLinkStepsSelect sourceDir={sourceValue} outputDir={outputValue} setFilesToLink={setFilesToLink} changeStep={changeStep} filesToLink={filesToLink} />
       ) : currentStep === 3 ? (
         <CreateFileLinkStepsCreate changeStep={changeStep} filesToLink={filesToLink} createFileLinks={createFileLinks} />
       ) : null}
-    </div>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import { join } from '@tauri-apps/api/path';
 import { DirEntry } from '@tauri-apps/plugin-fs';
 import { family } from '@tauri-apps/plugin-os';
 import { ChildProcess, Command } from '@tauri-apps/plugin-shell';
+import { saveLinkInfoToSettings } from './settings';
 
 export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
   return array.reduce(
@@ -28,5 +29,7 @@ export const createSymLinks = async (sourceDir: string, outputDir: string, files
     }
   }
 
-  await Promise.all(commands);
+  await Promise.all(commands).then(() => saveLinkInfoToSettings(sourceDir, outputDir, filesToLink));
 };
+
+export const filesToIgnore: Set<string> = new Set(['.DS_Store']);

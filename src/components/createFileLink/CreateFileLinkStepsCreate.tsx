@@ -11,24 +11,19 @@ interface CreateFileLinkStepsCreateProps {
   createFileLinks: () => Promise<void>;
 }
 export const CreateFileLinkStepsCreate: FC<CreateFileLinkStepsCreateProps> = ({ changeStep, filesToLink, createFileLinks }) => {
-  const [viewSelectedFiles, setViewSelectedFiles] = useState(false);
+  const [viewingSelectedFiles, setViewingSelectedFiles] = useState(false);
 
   const handlePrev = () => changeStep('prev');
 
   return (
     <>
       <ModalTopSectionContainer title="Create Links" description="Create Links for the selected files and folders.">
-        <div className="collapse collapse-arrow">
-          <input type="checkbox" onChange={e => setViewSelectedFiles(e.target.checked)} />
-          <div className="collapse-title font-medium bg-base-200">{viewSelectedFiles ? 'Hide' : 'View'} Selected Files</div>
-          <div className="collapse-content flex flex-col justify-center items-start">
+        <div className={`collapse collapse-arrow${viewingSelectedFiles ? ' min-h-[130px]' : ''}`}>
+          <input type="checkbox" onChange={e => setViewingSelectedFiles(e.target.checked)} />
+          <div className="collapse-title font-medium bg-base-200">{viewingSelectedFiles ? 'Hide' : 'View'} Selected Files</div>
+          <div className="collapse-content flex flex-col justify-center items-start min-h-[130px]">
             <div className="overflow-x-auto w-full">
               <table className="table table-xs table-zebra table-pin-rows">
-                {/* <thead>
-                  <tr>
-                    <th>Name</th>
-                  </tr>
-                </thead> */}
                 <tbody>
                   {filesToLink?.map(file => (
                     <tr key={file.name}>
