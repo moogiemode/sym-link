@@ -1,5 +1,5 @@
 import { join } from '@tauri-apps/api/path';
-import { DirEntry, FileInfo, lstat } from '@tauri-apps/plugin-fs';
+import { DirEntry, FileInfo, stat } from '@tauri-apps/plugin-fs';
 import { load } from '@tauri-apps/plugin-store';
 
 const settings = await load('settings.json', { autoSave: false });
@@ -12,39 +12,28 @@ const saveLinkInfoToSettings = async (sourceDir: string, outputDir: string, file
 };
 
 interface SavedLinkedFiles {
+  key: string;
   sourceDir: string;
   outputDir: string;
   files: FileInfo[];
 }
 
 const getSavedLinkedFiles = async () => {
-  const savedFilesPromise: Promise<SavedLinkedFiles>[] = [];
   const savedFilesFromSettings = (await settings.get('linkedFiles')) as { [n: string]: string[] };
+  if (!savedFilesFromSettings) return;
 
-  // console.log(savedFilesFromSettings);
-
-  for (const [key, value] of Object.entries(savedFilesFromSettings)) {
-    savedFilesPromise.push(buildFromKeyValue(key, value));
-  }
+  const savedFilesPromise: Promise<SavedLinkedFiles>[] = Object.entries(savedFilesFromSettings).map(([key, value]) => buildFromKeyValue(key, value));
 
   const savedFiles = await Promise.all(savedFilesPromise);
-
-  // console.log(savedFiles);
+  console.log(savedFiles);
 };
 
 const buildFromKeyValue: (key: string, value: string[]) => Promise<SavedLinkedFiles> = async (key, value) => {
   const [sourceDir, outputDir] = key.split(':');
 
-  const files: FileInfo[] = await Promise.all(
-    value.map(async fileName => {
-      const linkedFilePath = await join(sourceDir, fileName);
-      const linkedFileStat = await lstat(linkedFilePath).catch(() => console.log(`Error reading file: ${linkedFilePath}`));
-      // return linkedFileStat;
-      return {} as FileInfo;
-    }),
-  );
+  const files: FileInfo[] = await Promise.all(value.map(async fileName => await stat(await join(sourceDir, fileName))));
 
-  return { sourceDir, outputDir, files: [] };
+  return { key, sourceDir, outputDir, files };
 };
 
 export { getSavedLinkedFiles, saveLinkInfoToSettings, settings };
