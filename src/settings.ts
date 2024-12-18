@@ -1,40 +1,104 @@
-import { join } from '@tauri-apps/api/path';
-import { DirEntry, FileInfo, stat } from '@tauri-apps/plugin-fs';
+import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { load } from '@tauri-apps/plugin-store';
+import { LinkedFolder } from './types';
+import { arrayToObject } from './utils';
 
 const settings = await load('settings.json', { autoSave: false });
 
-const saveLinkInfoToSettings = async (sourceDir: string, outputDir: string, filesToLink: DirEntry[]) => {
-  const newLinkedFilesEntry = { [[sourceDir, outputDir, Date.now()].join(':')]: filesToLink.map(f => f.name) };
+interface SavedLinkedFileJSON {
+  sourceDir: string;
+  outputDir: string;
+  fullySynced: boolean;
+  fileNames: string[];
+  lastSyncedTime: number;
+}
+
+const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) => [sourceDir, outputDir].join(':');
+
+const createLinkedFilesSettingsObj = ({ sourceDir, outputDir, fullySynced, filesToLink }: Pick<LinkedFolder, 'sourceDir' | 'outputDir' | 'fullySynced'> & { filesToLink: DirEntry[] }) => {
+  const linkedFileObj: SavedLinkedFileJSON = {
+    sourceDir,
+    outputDir,
+    fullySynced,
+    fileNames: filesToLink.map(fileEntry => fileEntry.name),
+    lastSyncedTime: Date.now(),
+  };
+  return { linkKey: getLinkedFilesSettingsKey(sourceDir, outputDir), linkValue: JSON.stringify(linkedFileObj) };
+};
+
+const saveLinkInfoToSettings = async ({ sourceDir, outputDir, filesToLink, fullySynced }: { sourceDir: string; outputDir: string; filesToLink: DirEntry[]; fullySynced: LinkedFolder['fullySynced'] }) => {
+  const { linkKey, linkValue } = createLinkedFilesSettingsObj({ sourceDir, outputDir, fullySynced, filesToLink });
   const linkedFiles = (await settings.get('linkedFiles')) as { [n: string]: string[] };
-  settings.set('linkedFiles', { ...linkedFiles, ...newLinkedFilesEntry });
+  settings.set('linkedFiles', { ...linkedFiles, [linkKey]: linkValue });
   settings.save();
 };
 
-interface SavedLinkedFiles {
-  key: string;
-  sourceDir: string;
-  outputDir: string;
-  timeSynced: number;
-  files: FileInfo[];
-}
+const getLinkedFolderFromSettings: (linkKey: string, linkValue?: string) => Promise<LinkedFolder | null> = async (linkKey, linkValue) => {
+  let retrievedSavedfile: SavedLinkedFileJSON | null = null;
 
-const getSavedLinkedFiles = async () => {
-  const savedFilesFromSettings = (await settings.get('linkedFiles')) as { [n: string]: string[] };
-  if (!savedFilesFromSettings) return;
+  if (!linkValue) {
+    const linkedFiles = (await settings.get('linkedFiles')) as { [n: string]: string };
+    linkValue = linkedFiles[linkKey];
+  }
 
-  const savedFilesPromise: Promise<SavedLinkedFiles>[] = Object.entries(savedFilesFromSettings).map(([key, value]) => buildFromKeyValue(key, value));
+  try {
+    retrievedSavedfile = JSON.parse(linkValue);
+  } catch (error) {
+    console.error('Error parsing linked file from settings:', error);
+  }
 
-  const savedFiles = await Promise.all(savedFilesPromise);
-  console.log(savedFiles);
+  if (!retrievedSavedfile) return null;
+
+  const sourceDirFiles = readDir(retrievedSavedfile.sourceDir);
+  const outputDirFiles = readDir(retrievedSavedfile.outputDir);
+
+  const [sourceFiles, outputFiles] = await Promise.all([sourceDirFiles, outputDirFiles]).then(([sourceFiles, outputFiles]) => [arrayToObject(sourceFiles, 'name'), arrayToObject(outputFiles, 'name')]);
+
+  const files: string[] = [];
+  const filesInOutputNoLongerSymLinks: string[] = [];
+  const filesMissingFromSource: string[] = [];
+  const filesMissingFromOutput: string[] = [];
+  const filesMissingFromBoth: string[] = [];
+
+  for (const fileName of retrievedSavedfile.fileNames) {
+    const sourceFile = sourceFiles[fileName];
+    const outputFile = outputFiles[fileName];
+
+    if (sourceFile && outputFile) {
+      if (outputFile.isSymlink) {
+        files.push(fileName);
+      } else {
+        filesInOutputNoLongerSymLinks.push(fileName);
+      }
+    } else if (!sourceFile && !outputFile) {
+      filesMissingFromBoth.push(fileName);
+    } else if (sourceFile) {
+      filesMissingFromOutput.push(fileName);
+    } else if (outputFile) {
+      filesMissingFromSource.push(fileName);
+    }
+  }
+
+  const linkedFolder: LinkedFolder = {
+    dirKey: linkKey,
+    sourceDir: retrievedSavedfile.sourceDir,
+    outputDir: retrievedSavedfile.outputDir,
+    fullySynced: retrievedSavedfile.fullySynced,
+    timeSynced: retrievedSavedfile.lastSyncedTime,
+    linkedFileNames: [],
+    filesInOutputNoLongerSymLinks,
+    filesMissingFromSource,
+    filesMissingFromOutput,
+    filesMissingFromBoth,
+  };
+
+  return linkedFolder;
 };
 
-const buildFromKeyValue: (key: string, value: string[]) => Promise<SavedLinkedFiles> = async (key, value) => {
-  const [sourceDir, outputDir, timeSynced] = key.split(':');
-
-  const files: FileInfo[] = await Promise.all(value.map(async fileName => await stat(await join(sourceDir, fileName))));
-
-  return { key, sourceDir, outputDir, files, timeSynced: Number(timeSynced) };
+const getAllLinkedFoldersFromSettings = async () => {
+  const linkedFiles = (await settings.get('linkedFiles')) as { [n: string]: string };
+  const linkedFolders = Object.entries(linkedFiles).map(([linkKey, linkValue]) => getLinkedFolderFromSettings(linkKey, linkValue));
+  return Promise.all(linkedFolders);
 };
 
-export { getSavedLinkedFiles, saveLinkInfoToSettings, settings };
+export { getAllLinkedFoldersFromSettings, saveLinkInfoToSettings, settings };

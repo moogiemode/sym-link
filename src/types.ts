@@ -14,3 +14,16 @@ export interface ISourceOutputFoldersContent {
 export interface IIconProps {
   className?: React.SVGProps<SVGSVGElement>['className'];
 }
+
+export interface LinkedFolder {
+  dirKey: string;
+  sourceDir: string;
+  outputDir: string;
+  linkedFileNames: string[];
+  filesInOutputNoLongerSymLinks: string[];
+  filesMissingFromSource: string[];
+  filesMissingFromOutput: string[];
+  filesMissingFromBoth: string[];
+  fullySynced: boolean;
+  timeSynced: number;
+}

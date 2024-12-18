@@ -1,17 +1,17 @@
 import { CreateFileLinkButton } from './components/createFileLink/CreateFileLinkButton';
 import { ArrowRightIcon } from './icons/ArrowRightIcon.tsx';
 import './init.ts';
-
+const date = new Date();
 function App() {
   return (
     <>
       <CreateFileLinkButton />
-      <div>
+      <div className='flex flex-1 flex-col max-w-full overflow-y-auto'>
         <div>
           <div className="flex items-center gap-3">
-            <div className="avatar">
-              <div className="mask mask-squircle h-12 w-12">
-                <img src="https://img.daisyui.com/images/profile/demo/2@94.webp" alt="Avatar Tailwind CSS Component" />
+            <div className="avatar size-14 bg-success mask mask-squircle">
+              <div>
+                <div className="text-xl font-bold flex justify-center items-center h-full w-full">A➤E</div>
               </div>
             </div>
             <div>
@@ -20,8 +20,13 @@ function App() {
                 <ArrowRightIcon className="size-6" />
                 <div className="font-bold">My Output Folder</div>
               </div>
-              <div className="text-sm opacity-50">{'C:\\Users\\YourName\\Documents\\YourFolder -> C:\\Users\\YourName\\Documents\\YourFolder'}</div>
-              <div>apple</div>
+              <div className="text-sm opacity-50">{'C:\\Users\\YourName\\Documents\\Your Fol der → C:\\Users\\YourName\\Documents\\YourFolder'}</div>
+              <div>
+                <div className='flex items-end'>
+                  <div className="text-sm opacity-75">Last Synced On: </div>
+                  <div className="text-xs opacity-50">{date.toLocaleString()}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

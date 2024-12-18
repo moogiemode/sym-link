@@ -16,7 +16,7 @@ export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
 }
 
 // POTENTIAL FOR OPTIMIZATION AS LARGE NUMBER OF FILES MAY REACH THE LIMIT. SUGGESTION - USE BATCHES OF 100 FILES
-export const createSymLinks = async (sourceDir: string, outputDir: string, filesToLink: DirEntry[]) => {
+export const createSymLinks = async (sourceDir: string, outputDir: string, filesToLink: DirEntry[], fullySynced: boolean) => {
   const osFamily = family();
 
   const commands: Promise<ChildProcess<string>>[] = [];
@@ -29,23 +29,7 @@ export const createSymLinks = async (sourceDir: string, outputDir: string, files
     }
   }
 
-  await Promise.all(commands).then(() => saveLinkInfoToSettings(sourceDir, outputDir, filesToLink));
+  await Promise.all(commands).then(() => saveLinkInfoToSettings({ sourceDir, outputDir, filesToLink, fullySynced }));
 };
 
 export const filesToIgnore: Set<string> = new Set(['.DS_Store']);
-
-const stringToColor = (string: string) => {
-  let hash = 0;
-
-  for (let i = 0; i < string.length; i++) hash = string.charCodeAt(i) + ((hash << 5) - hash); // DJB2 hash algorithm
-
-  let color = '#';
-
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff;
-
-    color += ('00' + value.toString(16)).substr(-2);
-  }
-
-  return color;
-};
