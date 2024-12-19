@@ -1,11 +1,5 @@
 import { DirEntry } from '@tauri-apps/plugin-fs';
 
-export interface ICreateLinkModalState {
-  open: boolean;
-  inputDir: string;
-  outputDir: string;
-}
-
 export interface ISourceOutputFoldersContent {
   sourceDirFiles: Record<string, DirEntry>;
   outputDirFiles: Record<string, DirEntry>;
@@ -19,11 +13,11 @@ export interface LinkedFolder {
   dirKey: string;
   sourceDir: string;
   outputDir: string;
-  linkedFileNames: string[];
+  filesSynced: string[];
   filesInOutputNoLongerSymLinks: string[];
   filesMissingFromSource: string[];
   filesMissingFromOutput: string[];
   filesMissingFromBoth: string[];
-  fullySynced: boolean;
+  allFolderItemsSynced: boolean;
   timeSynced: number;
 }

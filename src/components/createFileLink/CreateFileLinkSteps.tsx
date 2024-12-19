@@ -1,5 +1,5 @@
-import { createSymLinks } from '@/utils';
-import { DirEntry } from '@tauri-apps/plugin-fs';
+import { createSymLinks, removeFilesToIgnore } from '@/utils';
+import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { FC, useState } from 'react';
 import { CreateFileLinkStepsCreate } from './CreateFileLinkStepsCreate';
 import { CreateFileLinkStepsOutput } from './CreateFileLinkStepsOutput';
@@ -15,8 +15,8 @@ interface IStep {
 
 export const CreateFileLinkSteps: FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [sourceValue, setSourceValue] = useState('');
-  const [outputValue, setOutputValue] = useState('');
+  const [sourceDir, setSourceDir] = useState('');
+  const [outputDir, setOutputDir] = useState('');
   const [filesToLink, setFilesToLink] = useState<DirEntry[]>();
 
   const changeStep = (step: 'next' | 'prev') => {
@@ -32,7 +32,9 @@ export const CreateFileLinkSteps: FC = () => {
       alert('No files have been selected to link.');
       return;
     }
-    await createSymLinks(sourceValue, outputValue, filesToLink);
+
+    const sourceDirFilesLength = await readDir(sourceDir).then(sourceFiles => removeFilesToIgnore(sourceFiles).length);
+    await createSymLinks({ sourceDir, outputDir, filesToLink, allFolderItemsSynced: sourceDirFilesLength === filesToLink.length });
   };
 
   return (
@@ -45,11 +47,11 @@ export const CreateFileLinkSteps: FC = () => {
         ))}
       </ul>
       {currentStep === 0 ? (
-        <CreateFileLinkStepsSource setSourceDir={setSourceValue} changeStep={changeStep} sourceDir={sourceValue} />
+        <CreateFileLinkStepsSource setSourceDir={setSourceDir} changeStep={changeStep} sourceDir={sourceDir} />
       ) : currentStep === 1 ? (
-        <CreateFileLinkStepsOutput setOutputDir={setOutputValue} changeStep={changeStep} sourceDir={sourceValue} outputDir={outputValue} />
+        <CreateFileLinkStepsOutput setOutputDir={setOutputDir} changeStep={changeStep} sourceDir={sourceDir} outputDir={outputDir} />
       ) : currentStep === 2 ? (
-        <CreateFileLinkStepsSelect sourceDir={sourceValue} outputDir={outputValue} setFilesToLink={setFilesToLink} changeStep={changeStep} filesToLink={filesToLink} />
+        <CreateFileLinkStepsSelect sourceDir={sourceDir} outputDir={outputDir} setFilesToLink={setFilesToLink} changeStep={changeStep} filesToLink={filesToLink} />
       ) : currentStep === 3 ? (
         <CreateFileLinkStepsCreate changeStep={changeStep} filesToLink={filesToLink} createFileLinks={createFileLinks} />
       ) : null}

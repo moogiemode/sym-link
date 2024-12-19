@@ -15,8 +15,20 @@ export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
   );
 }
 
+export const filesToIgnore: Set<string> = new Set(['.DS_Store']);
+
+export function removeFilesToIgnore<T extends string | DirEntry>(files: T[]): T[] {
+  return files.filter(file => {
+    if (typeof file === 'string') {
+      return !filesToIgnore.has(file);
+    } else {
+      return !filesToIgnore.has(file.name);
+    }
+  });
+}
+
 // POTENTIAL FOR OPTIMIZATION AS LARGE NUMBER OF FILES MAY REACH THE LIMIT. SUGGESTION - USE BATCHES OF 100 FILES
-export const createSymLinks = async (sourceDir: string, outputDir: string, filesToLink: DirEntry[], fullySynced: boolean) => {
+export const createSymLinks = async ({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }: { sourceDir: string; outputDir: string; filesToLink: DirEntry[]; allFolderItemsSynced: boolean }) => {
   const osFamily = family();
 
   const commands: Promise<ChildProcess<string>>[] = [];
@@ -29,7 +41,5 @@ export const createSymLinks = async (sourceDir: string, outputDir: string, files
     }
   }
 
-  await Promise.all(commands).then(() => saveLinkInfoToSettings({ sourceDir, outputDir, filesToLink, fullySynced }));
+  await Promise.all(commands).then(() => saveLinkInfoToSettings({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }));
 };
-
-export const filesToIgnore: Set<string> = new Set(['.DS_Store']);

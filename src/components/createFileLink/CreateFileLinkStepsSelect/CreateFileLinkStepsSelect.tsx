@@ -1,5 +1,5 @@
 import { ISourceOutputFoldersContent } from '@/types';
-import { arrayToObject, filesToIgnore } from '@/utils';
+import { arrayToObject, removeFilesToIgnore } from '@/utils';
 import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { FC, useEffect, useRef, useState } from 'react';
 import { ModalTopSectionContainer } from '../ModalTopSectionContainer';
@@ -28,11 +28,11 @@ export const CreateFileLinkStepsSelect: FC<CreateFileLinkStepsSelectProps> = ({ 
       Promise.all([sourceFiles, outputFiles]).then(values => {
         const dirFiles = {
           sourceDirFiles: arrayToObject(
-            values[0].filter(file => !filesToIgnore.has(file.name)),
+            removeFilesToIgnore(values[0]),
             'name',
           ),
           outputDirFiles: arrayToObject(
-            values[1].filter(file => !filesToIgnore.has(file.name)),
+            removeFilesToIgnore(values[1]),
             'name',
           ),
         };

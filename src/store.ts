@@ -1,39 +1,27 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { ICreateLinkModalState } from './types';
+import { LinkedFolder } from './types';
 
 type State = {
-  createLinkModalState: ICreateLinkModalState;
+  linkedFiles: Record<string, string | LinkedFolder>;
 };
 
 type Actions = {
-  openCreateLinkModal: () => void;
-  closeCreateLinkModal: () => void;
-  resetCreateLinkModalState: () => void;
+  setAllLinkedFiles: (linkedFiles: Record<string, string | LinkedFolder>) => void;
+  setLinkedFile: (linkedFile: string | LinkedFolder) => void;
 };
 
-const initialCreateLinkModalState: ICreateLinkModalState = {
-  open: false,
-  inputDir: '',
-  outputDir: '',
-};
-
-export const useCountStore = create<State & Actions>()(
+export const useSymLinkStore = create<State & Actions>()(
   immer(set => ({
-    createLinkModalState: initialCreateLinkModalState,
-    openCreateLinkModal: () => {
+    linkedFiles: {},
+    setAllLinkedFiles: linkedFiles => {
       set(state => {
-        state.createLinkModalState.open = true;
+        state.linkedFiles = linkedFiles;
       });
     },
-    closeCreateLinkModal: () => {
+    setLinkedFile: linkedFile => {
       set(state => {
-        state.createLinkModalState.open = false;
-      });
-    },
-    resetCreateLinkModalState: () => {
-      set(state => {
-        state.createLinkModalState = initialCreateLinkModalState;
+        state.linkedFiles[typeof linkedFile === 'string' ? linkedFile : linkedFile.dirKey] = linkedFile;
       });
     },
   })),
