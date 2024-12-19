@@ -11,8 +11,10 @@ export interface IIconProps {
 
 export interface LinkedFolder {
   dirKey: string;
-  sourceDir: string;
-  outputDir: string;
+  sourceDirName: string;
+  sourceDirPath: string;
+  outputDirName: string;
+  outputDirPath: string;
   filesSynced: string[];
   filesInOutputNoLongerSymLinks: string[];
   filesMissingFromSource: string[];

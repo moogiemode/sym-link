@@ -1,3 +1,4 @@
+import { basename } from '@tauri-apps/api/path';
 import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { load } from '@tauri-apps/plugin-store';
 import { LinkedFolder } from './types';
@@ -15,7 +16,7 @@ interface SavedLinkedFileJSON {
 
 const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) => [sourceDir, outputDir].join(':');
 
-const createLinkedFilesSettingsObj = ({ sourceDir, outputDir, allFolderItemsSynced, filesToLink }: Pick<LinkedFolder, 'sourceDir' | 'outputDir' | 'allFolderItemsSynced'> & { filesToLink: DirEntry[] }) => {
+const createLinkedFilesSettingsObj = ({ sourceDir, outputDir, allFolderItemsSynced, filesToLink }: Pick<SavedLinkedFileJSON, 'sourceDir' | 'outputDir' | 'allFolderItemsSynced'> & { filesToLink: DirEntry[] }) => {
   const linkedFileObj: SavedLinkedFileJSON = {
     sourceDir,
     outputDir,
@@ -91,10 +92,14 @@ const getLinkedFolderFromSettings: (linkKey: string, linkValue?: string) => Prom
     }
   }
 
+  const [sourceDirName, outputDirName] = await Promise.all([retrievedSavedfile.sourceDir, retrievedSavedfile.outputDir].map(async path => await basename(path)));
+
   const linkedFolder: LinkedFolder = {
     dirKey: linkKey,
-    sourceDir: retrievedSavedfile.sourceDir,
-    outputDir: retrievedSavedfile.outputDir,
+    sourceDirName,
+    outputDirName,
+    sourceDirPath: retrievedSavedfile.sourceDir,
+    outputDirPath: retrievedSavedfile.outputDir,
     allFolderItemsSynced: retrievedSavedfile.allFolderItemsSynced,
     timeSynced: retrievedSavedfile.lastSyncedTime,
     filesSynced,

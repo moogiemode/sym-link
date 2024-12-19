@@ -6,7 +6,7 @@ export const LinkedFilesDisplay = () => {
   return (
     <div className="flex flex-1 flex-col max-w-full overflow-y-auto">
       {Object.values(linkedFiles).map(linkedFile => (
-        <LinkedFileInfo key={typeof linkedFile === 'string' ? linkedFile : linkedFile.dirKey} />
+        <LinkedFileInfo key={typeof linkedFile === 'string' ? linkedFile : linkedFile.dirKey} {...linkedFile} />
       ))}
     </div>
   );
