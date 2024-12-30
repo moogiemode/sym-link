@@ -26,16 +26,16 @@
  * ```
  */
 
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <div><h1>💖 Hello World!</1h > <p>Welcome to your Electron application.</p></div>
-  </StrictMode>,
-)
-
+    <div>
+      <h1>💖 Hello World!</h1> <p>Welcome to your Electron application.</p>
+    </div>
+  </StrictMode>
+);
 
 // console.log('👋 This message is being logged by "renderer.ts", included via Vite');
