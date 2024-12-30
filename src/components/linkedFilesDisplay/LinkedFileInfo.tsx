@@ -2,9 +2,9 @@ import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 import { LinkedFolder } from '@/types';
 import { FC } from 'react';
 
-export const LinkedFileInfo: FC<LinkedFolder | string> = props => {
+export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ linkedFile }) => {
   const { dirKey, sourceDirName, outputDirName, sourceDirPath, outputDirPath, filesSynced, filesMissingFromSource, filesMissingFromOutput, filesMissingFromBoth, filesInOutputNoLongerSymLinks, timeSynced } =
-    typeof props === 'string' ? {} : props;
+    typeof linkedFile === 'string' ? {} : linkedFile;
   return (
     <div className="flex items-center gap-3">
       <div className="avatar size-14 bg-success mask mask-squircle">
