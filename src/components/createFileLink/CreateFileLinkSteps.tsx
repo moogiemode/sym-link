@@ -2,10 +2,10 @@ import { createSymLinks, removeFilesToIgnore } from '@/utils';
 import { Dirent } from 'fs';
 // import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { FC, useState } from 'react';
-// import { CreateFileLinkStepsCreate } from './CreateFileLinkStepsCreate';
-// import { CreateFileLinkStepsOutput } from './CreateFileLinkStepsOutput';
-// import { CreateFileLinkStepsSelect } from './CreateFileLinkStepsSelect/CreateFileLinkStepsSelect';
-// import { CreateFileLinkStepsSource } from './CreateFileLinkStepsSource';
+import { CreateFileLinkStepsCreate } from './CreateFileLinkStepsCreate';
+import { CreateFileLinkStepsOutput } from './CreateFileLinkStepsOutput';
+import { CreateFileLinkStepsSelect } from './CreateFileLinkStepsSelect/CreateFileLinkStepsSelect';
+import { CreateFileLinkStepsSource } from './CreateFileLinkStepsSource';
 
 interface IStep {
   label: string;
@@ -47,7 +47,7 @@ export const CreateFileLinkSteps: FC = () => {
           </li>
         ))}
       </ul>
-      {/* {currentStep === 0 ? (
+      {currentStep === 0 ? (
         <CreateFileLinkStepsSource setSourceDir={setSourceDir} changeStep={changeStep} sourceDir={sourceDir} />
       ) : currentStep === 1 ? (
         <CreateFileLinkStepsOutput setOutputDir={setOutputDir} changeStep={changeStep} sourceDir={sourceDir} outputDir={outputDir} />
@@ -55,7 +55,7 @@ export const CreateFileLinkSteps: FC = () => {
         <CreateFileLinkStepsSelect sourceDir={sourceDir} outputDir={outputDir} setFilesToLink={setFilesToLink} changeStep={changeStep} filesToLink={filesToLink} />
       ) : currentStep === 3 ? (
         <CreateFileLinkStepsCreate changeStep={changeStep} filesToLink={filesToLink} createFileLinks={createFileLinks} />
-      ) : null} */}
+      ) : null}
     </>
   );
 };

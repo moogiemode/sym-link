@@ -1,8 +1,8 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
-import { readdir, readFile, writeFile } from 'fs/promises';
+import { readdir, readFile, readlink, symlink, writeFile } from 'fs/promises';
 import started from 'electron-squirrel-startup';
-import { ensureDirectory } from './utils';
+import { ensureDirectory } from './ipcHandlerUtils';
 
 const symLinkAppDataFolderName = 'SymLink';
 const symLinkSettingsFileName = 'settings.json';
@@ -41,6 +41,10 @@ const createWindow = () => {
   });
 
   ipcMain.handle('read-directory', (_, dirPath: string) => readdir(dirPath, { withFileTypes: true }));
+  ipcMain.handle('read-link', (_, linkPath: string) => readlink(linkPath, 'utf-8'));
+
+  ipcMain.handle('sym-link', async (_, sourcePath: string, linkPath: string) => await symlink(sourcePath, linkPath));
+  ipcMain.handle('ensure-directory', async (_, dirPath: string, allowCreate?: boolean) => await ensureDirectory(dirPath, allowCreate));
 
   ipcMain.handle('save-settings', async (_, key: string, value: unknown) => {
     const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);

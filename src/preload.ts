@@ -6,9 +6,13 @@ import { Dirent } from 'fs';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   setTitle: (title: string) => ipcRenderer.send('set-title', title),
-  openDialog: () => ipcRenderer.invoke('open-dialog'),
 
+  openDialog: () => ipcRenderer.invoke('open-dialog'),
   readDirectory: (dirPath: string) => ipcRenderer.invoke('read-directory', dirPath),
+  readLink: (linkPath: string) => ipcRenderer.invoke('read-link', linkPath),
+
+  symLink: (sourcePath: string, linkPath: string) => ipcRenderer.invoke('sym-link', sourcePath, linkPath),
+  ensureDirectory: (dirPath: string, allowCreate?: boolean) => ipcRenderer.invoke('ensure-directory', dirPath, allowCreate),
 
   saveSettings: (key: string, value: unknown) => ipcRenderer.invoke('save-settings', key, value),
   loadSettings: () => ipcRenderer.invoke('get-settings'),
@@ -20,9 +24,14 @@ declare global {
   interface Window {
     electronAPI: {
       setTitle: (title: string) => void;
-      openDialog: () => Promise<string>;
 
+      openDialog: () => Promise<string>;
       readDirectory: (dirPath: string) => Promise<Dirent[]>;
+      readLink: (linkPath: string) => Promise<string>;
+
+      symLink: (sourcePath: string, linkPath: string) => Promise<void>;
+      ensureDirectory: (dirPath: string, allowCreate?: boolean) => Promise<boolean>;
+
       saveSettings: (key: string, value: unknown) => Promise<void>;
       loadSettings: () => Promise<Record<string, unknown> | null>;
     };

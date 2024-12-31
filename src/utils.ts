@@ -4,7 +4,6 @@
 // import { ChildProcess, Command } from '@tauri-apps/plugin-shell';
 // import { saveLinkInfoToSettings } from './settings';
 import { Dirent } from 'fs';
-import { access, mkdir, readlink } from 'fs/promises';
 import path from 'path';
 
 export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
@@ -20,18 +19,9 @@ export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
 
 export const filesToIgnore = new Set<string>(['.DS_Store']);
 
-export const ensureDirectory: (dirPath: string) => Promise<void> = async dirPath => {
-  try {
-    await access(dirPath);
-  } catch {
-    // Directory doesn't exist, create it
-    await mkdir(dirPath, { recursive: true });
-  }
-};
-
 export const checkLinkTarget: (symlinkPath: string, originPath: string) => Promise<boolean> = async (symlinkPath, originFilePath) => {
   try {
-    const resolvedTargetPath = path.resolve(path.dirname(symlinkPath), await readlink(symlinkPath));
+    const resolvedTargetPath = path.resolve(path.dirname(symlinkPath), await window.electronAPI.readLink(symlinkPath));
 
     return resolvedTargetPath === path.resolve(originFilePath);
   } catch (err) {
@@ -50,19 +40,16 @@ export function removeFilesToIgnore<T extends string | Dirent>(files: T[]): T[] 
   });
 }
 
+export const dirExists = async (dirPath: string) => {
+  try {
+    return await window.electronAPI.ensureDirectory(dirPath);
+  } catch {
+    return false;
+  }
+}
+
 // POTENTIAL FOR OPTIMIZATION AS LARGE NUMBER OF FILES MAY REACH THE LIMIT. SUGGESTION - USE BATCHES OF 100 FILES
 export const createSymLinks = async ({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }: { sourceDir: string; outputDir: string; filesToLink: Dirent[]; allFolderItemsSynced: boolean }) => {
-  // const osFamily = family();
-
-  // const commands: Promise<ChildProcess<string>>[] = [];
-
-  // for (const file of filesToLink) {
-  //   if (osFamily === 'unix') {
-  //     commands.push(Command.create('exec-sh', ['-c', `ln -s "${await join(sourceDir, file.name)}" "${await join(outputDir, file.name)}"`]).execute());
-  //   } else if (osFamily === 'windows') {
-  //     commands.push(Command.create('exec-cmd', ['/c', `mklink${file.isDirectory ? ' /D' : ''} "${await join(outputDir, file.name)}" "${await join(sourceDir, file.name)}"`]).execute());
-  //   }
-  // }
-
-  // await Promise.all(commands).then(() => saveLinkInfoToSettings({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }));
+  await Promise.all(filesToLink.map(async file => window.electronAPI.symLink(path.join(sourceDir, file.name), path.join(outputDir, file.name))));
+  // .then(() =>saveLinkInfoToSettings({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }));
 };
