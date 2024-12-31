@@ -11,7 +11,9 @@ export const App = () => {
   return (
     <div>
       <input value={titleState} onChange={e => setTitleState(e.target.value)} />
-      <button onClick={openDialog}>Set Title</button>
+      <button className="btn" onClick={openDialog}>
+        Set Title
+      </button>
       <h1>💖 Hello World!</h1> <p>Welcome to your Electron application.</p>
     </div>
   );
