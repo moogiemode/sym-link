@@ -4,6 +4,7 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import pluginReact from 'eslint-plugin-react';
 
 export default tseslint.config(
   { ignores: ['**/.vite/*', '**/.node_modules/*', 'dist'] },
@@ -26,5 +27,7 @@ export default tseslint.config(
       // '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
+  pluginReact.configs.flat.recommended,
+  // reactHooks.configs.recommended,
   eslintPluginPrettierRecommended,
 );
