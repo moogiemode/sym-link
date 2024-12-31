@@ -25,17 +25,13 @@ export default tseslint.config(
     plugins: {
       pluginReact,
       'react-hooks': reactHooks,
-      // 'react-refresh': reactRefresh,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // 'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       // '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat['jsx-runtime'], // Add this if you are using React 17+
-
-  // reactHooks.configs.recommended,
   eslintPluginPrettierRecommended,
 );
