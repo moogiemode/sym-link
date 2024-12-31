@@ -1,4 +1,5 @@
 import { createSymLinks, removeFilesToIgnore } from '@/utils';
+import { Dirent } from 'fs';
 // import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { FC, useState } from 'react';
 // import { CreateFileLinkStepsCreate } from './CreateFileLinkStepsCreate';
@@ -17,7 +18,7 @@ export const CreateFileLinkSteps: FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [sourceDir, setSourceDir] = useState('');
   const [outputDir, setOutputDir] = useState('');
-  const [filesToLink, setFilesToLink] = useState<DirEntry[]>();
+  const [filesToLink, setFilesToLink] = useState<Dirent[]>();
 
   const changeStep = (step: 'next' | 'prev') => {
     if (step === 'next' && currentStep < steps.length - 1) {
@@ -33,7 +34,7 @@ export const CreateFileLinkSteps: FC = () => {
       return;
     }
 
-    const sourceDirFilesLength = await readDir(sourceDir).then(sourceFiles => removeFilesToIgnore(sourceFiles).length);
+    const sourceDirFilesLength = await window.electronAPI.readDirectory(sourceDir).then(sourceFiles => removeFilesToIgnore(sourceFiles).length);
     await createSymLinks({ sourceDir, outputDir, filesToLink, allFolderItemsSynced: sourceDirFilesLength === filesToLink.length });
   };
 

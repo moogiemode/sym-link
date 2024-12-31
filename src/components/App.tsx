@@ -12,7 +12,7 @@ export const App = () => {
 
   return (
     <>
-      <button onClick={async () => await window.electronAPI.saveSettings({apple: "banana"})}>Open Dialog</button>
+      <button onClick={async () => await window.electronAPI.saveSettings('NEW APPLE', 'OLD BANANA')}>Open Dialog</button>
       <CreateFileLinkButton />
       {/* <LinkedFilesDisplay /> */}
     </>

@@ -40,11 +40,7 @@ const createWindow = () => {
     }
   });
 
-  ipcMain.handle('get-app-data-path', () => app.getPath('appData'));
-
   ipcMain.handle('read-directory', (_, dirPath: string) => readdir(dirPath, { withFileTypes: true }));
-
-  ipcMain.handle('load-settings', async () => JSON.parse(await readFile(path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName), 'utf-8')));
 
   ipcMain.handle('save-settings', async (_, key: string, value: unknown) => {
     const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);
@@ -52,6 +48,14 @@ const createWindow = () => {
     const settingsObj = JSON.parse(await readFile(settingsPath, 'utf-8')) || {};
     settingsObj[key] = value;
     await writeFile(settingsPath, JSON.stringify(settingsObj, null, 2));
+  });
+
+  ipcMain.handle('get-settings', async () => {
+    try {
+      return JSON.parse(await readFile(path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName), 'utf-8'));
+    } catch {
+      return null;
+    }
   });
 
   // and load the index.html of the app.
