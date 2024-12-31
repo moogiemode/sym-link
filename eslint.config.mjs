@@ -26,6 +26,11 @@ export default tseslint.config(
       pluginReact,
       'react-hooks': reactHooks,
     },
+    settings: {
+      react: {
+        version: 'detect', // Automatically detect React version
+      },
+    },
     rules: {
       ...reactHooks.configs.recommended.rules,
       // '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
