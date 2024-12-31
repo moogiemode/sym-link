@@ -3,9 +3,18 @@ import { useState } from 'react';
 // import { LinkedFilesDisplay } from './linkedFilesDisplay/LinkedFilesDisplay';
 
 export const App = () => {
+  const [titleState, setTitleState] = useState('this is my new title');
+
+  const openDialog = async () => {
+    const path = await window.electronAPI.openDialog();
+    console.log(path);
+  };
+
   return (
     <>
-      <button onClick={async () => await window.electronAPI.getAppDataPath().then(res => console.log(res))}>Open Dialog</button>
+      <button onClick={async () => await window.electronAPI.getAppDataPath()}>Open Dialog</button>
+      {/* <CreateFileLinkButton /> */}
+      {/* <LinkedFilesDisplay /> */}
     </>
   );
 };
