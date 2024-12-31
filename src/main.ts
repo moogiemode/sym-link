@@ -22,6 +22,7 @@ const createWindow = () => {
 
   ipcMain.on('set-title', setTitle);
   ipcMain.handle('open-dialog', openDialog);
+  ipcMain.handle('get-app-data-path', () => app.getPath('appData'));
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

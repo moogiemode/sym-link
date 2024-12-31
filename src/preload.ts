@@ -6,6 +6,7 @@ import { contextBridge, ipcRenderer } from 'electron/renderer';
 contextBridge.exposeInMainWorld('electronAPI', {
   setTitle: (title: string) => ipcRenderer.send('set-title', title),
   openDialog: () => ipcRenderer.invoke('open-dialog'),
+  getAppDataPath: () => ipcRenderer.invoke('get-app-data-path'),
 });
 
 // Add this type declaration in your renderer TypeScript file
@@ -15,6 +16,7 @@ declare global {
     electronAPI: {
       setTitle: (title: string) => void;
       openDialog: () => Promise<string>;
+      getAppDataPath: () => Promise<string>;
     };
   }
 }

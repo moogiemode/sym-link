@@ -1,20 +1,11 @@
 import { useState } from 'react';
+// import { CreateFileLinkButton } from './createFileLink/CreateFileLinkButton';
+// import { LinkedFilesDisplay } from './linkedFilesDisplay/LinkedFilesDisplay';
 
 export const App = () => {
-  const [titleState, setTitleState] = useState('this is my new title');
-
-  const openDialog = async () => {
-    const path = await window.electronAPI.openDialog();
-    console.log(path);
-  };
-
   return (
-    <div>
-      <input value={titleState} onChange={e => setTitleState(e.target.value)} />
-      <button className="btn" onClick={openDialog}>
-        Set Title
-      </button>
-      <h1>💖 Hello World!</h1> <p>Welcome to your Electron application.</p>
-    </div>
+    <>
+      <button onClick={async () => await window.electronAPI.getAppDataPath().then(res => console.log(res))}>Open Dialog</button>
+    </>
   );
 };
