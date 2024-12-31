@@ -1,5 +1,5 @@
 import { useState } from 'react';
-// import { CreateFileLinkButton } from './createFileLink/CreateFileLinkButton';
+import { CreateFileLinkButton } from './createFileLink/CreateFileLinkButton';
 // import { LinkedFilesDisplay } from './linkedFilesDisplay/LinkedFilesDisplay';
 
 export const App = () => {
@@ -12,8 +12,8 @@ export const App = () => {
 
   return (
     <>
-      <button onClick={async () => await window.electronAPI.getAppDataPath()}>Open Dialog</button>
-      {/* <CreateFileLinkButton /> */}
+      <button onClick={async () => await window.electronAPI.saveSettings({apple: "banana"})}>Open Dialog</button>
+      <CreateFileLinkButton />
       {/* <LinkedFilesDisplay /> */}
     </>
   );

@@ -3,19 +3,41 @@
 // import { family } from '@tauri-apps/plugin-os';
 // import { ChildProcess, Command } from '@tauri-apps/plugin-shell';
 // import { saveLinkInfoToSettings } from './settings';
+import { access, mkdir, readlink } from 'fs/promises';
+import path from 'path';
 
-// export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
-//   return array.reduce(
-//     (acc, item) => {
-//       const keyValue = String(item[key]);
-//       acc[keyValue] = item;
-//       return acc;
-//     },
-//     {} as Record<string, T>,
-//   );
-// }
+export function arrayToObject<T>(array: T[], key: keyof T): Record<string, T> {
+  return array.reduce(
+    (acc, item) => {
+      const keyValue = String(item[key]);
+      acc[keyValue] = item;
+      return acc;
+    },
+    {} as Record<string, T>,
+  );
+}
 
-// export const filesToIgnore: Set<string> = new Set(['.DS_Store']);
+export const filesToIgnore = new Set<string>(['.DS_Store']);
+
+export const ensureDirectory: (dirPath: string) => Promise<void> = async dirPath => {
+  try {
+    await access(dirPath);
+  } catch {
+    // Directory doesn't exist, create it
+    await mkdir(dirPath, { recursive: true });
+  }
+};
+
+export const checkLinkTarget: (symlinkPath: string, originPath: string) => Promise<boolean> = async (symlinkPath, originFilePath) => {
+  try {
+    const resolvedTargetPath = path.resolve(path.dirname(symlinkPath), await readlink(symlinkPath));
+
+    return resolvedTargetPath === path.resolve(originFilePath);
+  } catch (err) {
+    console.error(`Error checking symlink: ${err}`);
+    return false;
+  }
+};
 
 // export function removeFilesToIgnore<T extends string | DirEntry>(files: T[]): T[] {
 //   return files.filter(file => {

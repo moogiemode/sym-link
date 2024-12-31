@@ -1,6 +1,6 @@
 import eslint from '@eslint/js';
 import typescriptEslintParser from '@typescript-eslint/parser';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+// import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -38,5 +38,5 @@ export default tseslint.config(
   },
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat['jsx-runtime'], // Add this if you are using React 17+
-  eslintPluginPrettierRecommended,
+  // eslintPluginPrettierRecommended,
 );

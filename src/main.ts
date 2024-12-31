@@ -1,7 +1,11 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
+import { readdir, readFile, writeFile } from 'fs/promises';
 import started from 'electron-squirrel-startup';
-import { openDialog, setTitle } from './ipcMainFunctions';
+import { ensureDirectory } from './utils';
+
+const symLinkAppDataFolderName = 'SymLink';
+const symLinkSettingsFileName = 'settings.json';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -20,9 +24,35 @@ const createWindow = () => {
     },
   });
 
-  ipcMain.on('set-title', setTitle);
-  ipcMain.handle('open-dialog', openDialog);
+  ipcMain.on('set-title', (event, title) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
+    win.setTitle(title);
+  });
+
+  ipcMain.handle('open-dialog', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openDirectory'], //only directories can be selected
+    });
+
+    if (!canceled) {
+      return filePaths[0];
+    }
+  });
+
   ipcMain.handle('get-app-data-path', () => app.getPath('appData'));
+
+  ipcMain.handle('read-directory', (_, dirPath: string) => readdir(dirPath, { withFileTypes: true }));
+
+  ipcMain.handle('load-settings', async () => JSON.parse(await readFile(path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName), 'utf-8')));
+
+  ipcMain.handle('save-settings', async (_, key: string, value: unknown) => {
+    const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);
+    await ensureDirectory(path.dirname(settingsPath));
+    const settingsObj = JSON.parse(await readFile(settingsPath, 'utf-8')) || {};
+    settingsObj[key] = value;
+    await writeFile(settingsPath, JSON.stringify(settingsObj, null, 2));
+  });
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
