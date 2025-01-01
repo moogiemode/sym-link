@@ -67,7 +67,7 @@ const createWindow = () => {
 
   ipcMain.handle('save-settings', async (_, key: string, value: unknown) => {
     const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);
-    await ensureDirectory(path.dirname(settingsPath));
+    await ensureDirectory(path.dirname(settingsPath), true);
     const settingsObj = JSON.parse(await readFile(settingsPath, 'utf-8')) || {};
     settingsObj[key] = value;
     await writeFile(settingsPath, JSON.stringify(settingsObj, null, 2));
