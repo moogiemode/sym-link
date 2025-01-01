@@ -34,18 +34,21 @@ export const CreateFileLinkStepsCreate: FC<CreateFileLinkStepsCreateProps> = ({ 
                 <div className="overflow-x-auto w-full">
                   <table className="table table-xs table-zebra table-pin-rows">
                     <tbody>
-                      {filesToLink?.map(file => (
-                        <tr key={file.name}>
-                          <td>
-                            <div className="flex items-center gap-2">
-                              <div className="avatar">{file.isDirectory ? <FolderIcon className="size-5" /> : <FileIcon className="size-5" />}</div>
-                              <div>
-                                <div className="font-bold text-ellipsis whitespace-nowrap">{file.name}</div>
+                      {filesToLink?.map(file => {
+                        console.log(file);
+                        return (
+                          <tr key={file.name}>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                <div className="avatar">{file.isDirectory ? <FolderIcon className="size-5" /> : <FileIcon className="size-5" />}</div>
+                                <div>
+                                  <div className="font-bold text-ellipsis whitespace-nowrap">{file.name}</div>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

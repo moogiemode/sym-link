@@ -3,6 +3,7 @@ import path from 'path';
 import { readdir, readFile, readlink, symlink, writeFile } from 'fs/promises';
 import started from 'electron-squirrel-startup';
 import { ensureDirectory } from './ipcHandlerUtils';
+import { FileEntry } from './types';
 
 const symLinkAppDataFolderName = 'SymLink';
 const symLinkSettingsFileName = 'settings.json';
@@ -30,6 +31,11 @@ const createWindow = () => {
     win.setTitle(title);
   });
 
+  ipcMain.handle('path-join', async (_, ...pathArgs: string[]) => path.join(...pathArgs));
+  ipcMain.handle('path-resolve', async (_, ...pathArgs: string[]) => path.resolve(...pathArgs));
+  ipcMain.handle('path-dirname', async (_, pathArg: string) => path.dirname(pathArg));
+  ipcMain.handle('path-basename', async (_, pathArg: string) => path.basename(pathArg));
+
   ipcMain.handle('open-dialog', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       properties: ['openDirectory'], //only directories can be selected
@@ -40,8 +46,21 @@ const createWindow = () => {
     }
   });
 
-  ipcMain.handle('read-directory', (_, dirPath: string) => readdir(dirPath, { withFileTypes: true }));
-  ipcMain.handle('read-link', (_, linkPath: string) => readlink(linkPath, 'utf-8'));
+  ipcMain.handle('read-directory', async (_, dirPath: string) => {
+    const dirFiles = await readdir(dirPath, { withFileTypes: true });
+
+    const fileEntries: FileEntry[] = dirFiles.map(dirent => ({
+      name: dirent.name,
+      path: path.join(dirPath, dirent.name),
+      parentPath: dirPath,
+      isDirectory: dirent.isDirectory(),
+      isFile: dirent.isFile(),
+      isSymbolicLink: dirent.isSymbolicLink(),
+    }));
+
+    return fileEntries;
+  });
+  ipcMain.handle('read-link', async (_, linkPath: string) => await readlink(linkPath, 'utf-8'));
 
   ipcMain.handle('sym-link', async (_, sourcePath: string, linkPath: string) => await symlink(sourcePath, linkPath));
   ipcMain.handle('ensure-directory', async (_, dirPath: string, allowCreate?: boolean) => await ensureDirectory(dirPath, allowCreate));
@@ -54,9 +73,10 @@ const createWindow = () => {
     await writeFile(settingsPath, JSON.stringify(settingsObj, null, 2));
   });
 
-  ipcMain.handle('get-settings', async () => {
+  ipcMain.handle('get-settings', async (_, key: string) => {
     try {
-      return JSON.parse(await readFile(path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName), 'utf-8'));
+      const settings = JSON.parse(await readFile(path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName), 'utf-8'));
+      return settings[key];
     } catch {
       return null;
     }

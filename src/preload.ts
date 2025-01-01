@@ -3,9 +3,15 @@
 
 import { contextBridge, ipcRenderer } from 'electron/renderer';
 import { Dirent } from 'fs';
+import { ISymLinkSettings } from './types';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   setTitle: (title: string) => ipcRenderer.send('set-title', title),
+
+  pathJoin: (...paths: string[]) => ipcRenderer.invoke('path-join', ...paths),
+  pathResolve: (...paths: string[]) => ipcRenderer.invoke('path-resolve', ...paths),
+  pathDirname: (path: string) => ipcRenderer.invoke('path-dirname', path),
+  pathBasename: (path: string) => ipcRenderer.invoke('path-basename', path),
 
   openDialog: () => ipcRenderer.invoke('open-dialog'),
   readDirectory: (dirPath: string) => ipcRenderer.invoke('read-directory', dirPath),
@@ -15,7 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   ensureDirectory: (dirPath: string, allowCreate?: boolean) => ipcRenderer.invoke('ensure-directory', dirPath, allowCreate),
 
   saveSettings: (key: string, value: unknown) => ipcRenderer.invoke('save-settings', key, value),
-  loadSettings: () => ipcRenderer.invoke('get-settings'),
+  getSettings: (key: string) => ipcRenderer.invoke('get-settings', key),
 });
 
 // Add this type declaration in your renderer TypeScript file
@@ -25,6 +31,11 @@ declare global {
     electronAPI: {
       setTitle: (title: string) => void;
 
+      pathJoin: (...paths: string[]) => Promise<string>;
+      pathResolve: (...paths: string[]) => Promise<string>;
+      pathDirname: (path: string) => Promise<string>;
+      pathBasename: (path: string) => Promise<string>;
+
       openDialog: () => Promise<string>;
       readDirectory: (dirPath: string) => Promise<Dirent[]>;
       readLink: (linkPath: string) => Promise<string>;
@@ -32,8 +43,8 @@ declare global {
       symLink: (sourcePath: string, linkPath: string) => Promise<void>;
       ensureDirectory: (dirPath: string, allowCreate?: boolean) => Promise<boolean>;
 
-      saveSettings: (key: string, value: unknown) => Promise<void>;
-      loadSettings: () => Promise<Record<string, unknown> | null>;
+      saveSettings: <K extends keyof ISymLinkSettings>(key: K, value: ISymLinkSettings[K]) => Promise<void>;
+      getSettings: <K extends keyof ISymLinkSettings>(key: K) => Promise<ISymLinkSettings[K] | null>;
     };
   }
 }

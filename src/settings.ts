@@ -1,123 +1,95 @@
-// import { basename } from '@tauri-apps/api/path';
-// import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
-// import { load } from '@tauri-apps/plugin-store';
-// import { LinkedFolder } from './types';
-// import { arrayToObject, removeFilesToIgnore } from './utils';
+import { Dirent } from 'fs';
+import { ISymLinkedSettingsFolder, LinkedFolder } from './types';
+import { arrayToObject, removeFilesToIgnore } from './utils';
 
 // const settings = await load('settings.json', { autoSave: false });
 
-// interface SavedLinkedFileJSON {
-//   sourceDir: string;
-//   outputDir: string;
-//   allFolderItemsSynced: boolean;
-//   fileNames: string[];
-//   lastSyncedTime: number;
-// }
+const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) => [sourceDir, outputDir].join(':');
 
-// const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) => [sourceDir, outputDir].join(':');
+const saveLinkInfoToSettings = async ({
+  sourceDir,
+  outputDir,
+  filesToLink,
+  allFolderItemsSynced,
+}: {
+  sourceDir: string;
+  outputDir: string;
+  filesToLink: Dirent[];
+  allFolderItemsSynced: LinkedFolder['allFolderItemsSynced'];
+}) => {
+  const linkedFileObj: ISymLinkedSettingsFolder = {
+    sourceDir,
+    outputDir,
+    allFolderItemsSynced,
+    fileNames: filesToLink.map(fileEntry => fileEntry.name),
+    lastSyncedTime: Date.now(),
+  };
 
-// const createLinkedFilesSettingsObj = ({ sourceDir, outputDir, allFolderItemsSynced, filesToLink }: Pick<SavedLinkedFileJSON, 'sourceDir' | 'outputDir' | 'allFolderItemsSynced'> & { filesToLink: DirEntry[] }) => {
-//   const linkedFileObj: SavedLinkedFileJSON = {
-//     sourceDir,
-//     outputDir,
-//     allFolderItemsSynced,
-//     fileNames: filesToLink.map(fileEntry => fileEntry.name),
-//     lastSyncedTime: Date.now(),
-//   };
-//   return { linkKey: getLinkedFilesSettingsKey(sourceDir, outputDir), linkValue: JSON.stringify(linkedFileObj) };
-// };
+  const linkedFiles = await window.electronAPI.getSettings('linkedFiles');
+  await window.electronAPI.saveSettings('linkedFiles', { ...linkedFiles, [getLinkedFilesSettingsKey(sourceDir, outputDir)]: linkedFileObj });
+  // settings.save();
+};
 
-// const saveLinkInfoToSettings = async ({
-//   sourceDir,
-//   outputDir,
-//   filesToLink,
-//   allFolderItemsSynced,
-// }: {
-//   sourceDir: string;
-//   outputDir: string;
-//   filesToLink: DirEntry[];
-//   allFolderItemsSynced: LinkedFolder['allFolderItemsSynced'];
-// }) => {
-//   const { linkKey, linkValue } = createLinkedFilesSettingsObj({ sourceDir, outputDir, allFolderItemsSynced, filesToLink });
-//   const linkedFiles = (await settings.get('linkedFiles')) as { [n: string]: string[] };
-//   settings.set('linkedFiles', { ...linkedFiles, [linkKey]: linkValue });
-//   settings.save();
-// };
+const getLinkedFolderFromSettings: (linkKey: string, linkValue: ISymLinkedSettingsFolder) => Promise<LinkedFolder | string> = async (linkKey, linkValue) => {
+  const sourceDirFiles = window.electronAPI.readDirectory(linkValue.sourceDir);
+  const outputDirFiles = window.electronAPI.readDirectory(linkValue.outputDir);
 
-// const getLinkedFolderFromSettings: (linkKey: string, linkValue?: string) => Promise<LinkedFolder | string> = async (linkKey, linkValue) => {
-//   let retrievedSavedfile: SavedLinkedFileJSON | null = null;
-//   if (!linkValue) {
-//     const linkedFiles = (await settings.get('linkedFiles')) as { [n: string]: string };
-//     linkValue = linkedFiles[linkKey];
-//   }
+  const [sourceFiles, outputFiles] = await Promise.all([sourceDirFiles, outputDirFiles]).then(([sourceFiles, outputFiles]) => [
+    arrayToObject(removeFilesToIgnore(sourceFiles), 'name'),
+    arrayToObject(removeFilesToIgnore(outputFiles), 'name'),
+  ]);
 
-//   try {
-//     retrievedSavedfile = JSON.parse(linkValue);
-//   } catch (error) {
-//     console.error('Error parsing linked file from settings:', error);
-//   }
+  const filesSynced: string[] = [];
+  const filesInOutputNoLongerSymLinks: string[] = [];
+  const filesMissingFromSource: string[] = [];
+  const filesMissingFromOutput: string[] = [];
+  const filesMissingFromBoth: string[] = [];
 
-//   if (!retrievedSavedfile) return linkKey;
+  for (const fileName of linkValue.fileNames) {
+    const sourceFile = sourceFiles[fileName];
+    const outputFile = outputFiles[fileName];
 
-//   const sourceDirFiles = readDir(retrievedSavedfile.sourceDir);
-//   const outputDirFiles = readDir(retrievedSavedfile.outputDir);
+    if (sourceFile && outputFile) {
+      if (outputFile.isSymbolicLink) {
+        filesSynced.push(fileName);
+      } else {
+        filesInOutputNoLongerSymLinks.push(fileName);
+      }
+    } else if (!sourceFile && !outputFile) {
+      filesMissingFromBoth.push(fileName);
+    } else if (sourceFile) {
+      filesMissingFromOutput.push(fileName);
+    } else if (outputFile) {
+      filesMissingFromSource.push(fileName);
+    }
+  }
 
-//   const [sourceFiles, outputFiles] = await Promise.all([sourceDirFiles, outputDirFiles]).then(([sourceFiles, outputFiles]) => [
-//     arrayToObject(removeFilesToIgnore(sourceFiles), 'name'),
-//     arrayToObject(removeFilesToIgnore(outputFiles), 'name'),
-//   ]);
+  const [sourceDirName, outputDirName] = await Promise.all([linkValue.sourceDir, linkValue.outputDir].map(async path => await window.electronAPI.pathBasename(path)));
 
-//   const filesSynced: string[] = [];
-//   const filesInOutputNoLongerSymLinks: string[] = [];
-//   const filesMissingFromSource: string[] = [];
-//   const filesMissingFromOutput: string[] = [];
-//   const filesMissingFromBoth: string[] = [];
+  const linkedFolder: LinkedFolder = {
+    dirKey: linkKey,
+    sourceDirName,
+    outputDirName,
+    sourceDirPath: linkValue.sourceDir,
+    outputDirPath: linkValue.outputDir,
+    allFolderItemsSynced: linkValue.allFolderItemsSynced,
+    timeSynced: linkValue.lastSyncedTime,
+    filesSynced,
+    filesInOutputNoLongerSymLinks,
+    filesMissingFromSource,
+    filesMissingFromOutput,
+    filesMissingFromBoth,
+  };
 
-//   for (const fileName of retrievedSavedfile.fileNames) {
-//     const sourceFile = sourceFiles[fileName];
-//     const outputFile = outputFiles[fileName];
+  return linkedFolder;
+};
 
-//     if (sourceFile && outputFile) {
-//       if (outputFile.isSymlink) {
-//         filesSynced.push(fileName);
-//       } else {
-//         filesInOutputNoLongerSymLinks.push(fileName);
-//       }
-//     } else if (!sourceFile && !outputFile) {
-//       filesMissingFromBoth.push(fileName);
-//     } else if (sourceFile) {
-//       filesMissingFromOutput.push(fileName);
-//     } else if (outputFile) {
-//       filesMissingFromSource.push(fileName);
-//     }
-//   }
+const getAllLinkedFoldersFromSettings = async () => {
+  const linkedFiles = await window.electronAPI.getSettings('linkedFiles');
+  if (!linkedFiles) return null;
 
-//   const [sourceDirName, outputDirName] = await Promise.all([retrievedSavedfile.sourceDir, retrievedSavedfile.outputDir].map(async path => await basename(path)));
+  const linkedFolders = Object.entries(linkedFiles).map(([linkKey, linkValue]) => getLinkedFolderFromSettings(linkKey, linkValue));
+  return Promise.all(linkedFolders);
+};
 
-//   const linkedFolder: LinkedFolder = {
-//     dirKey: linkKey,
-//     sourceDirName,
-//     outputDirName,
-//     sourceDirPath: retrievedSavedfile.sourceDir,
-//     outputDirPath: retrievedSavedfile.outputDir,
-//     allFolderItemsSynced: retrievedSavedfile.allFolderItemsSynced,
-//     timeSynced: retrievedSavedfile.lastSyncedTime,
-//     filesSynced,
-//     filesInOutputNoLongerSymLinks,
-//     filesMissingFromSource,
-//     filesMissingFromOutput,
-//     filesMissingFromBoth,
-//   };
-
-//   return linkedFolder;
-// };
-
-// const getAllLinkedFoldersFromSettings = async () => {
-//   const linkedFiles = (await settings.get('linkedFiles')) as Record<string, string>;
-//   if (!linkedFiles) return null;
-
-//   const linkedFolders = Object.entries(linkedFiles).map(([linkKey, linkValue]) => getLinkedFolderFromSettings(linkKey, linkValue));
-//   return Promise.all(linkedFolders);
-// };
-
-// export { getAllLinkedFoldersFromSettings, saveLinkInfoToSettings, settings };
+export { getAllLinkedFoldersFromSettings, saveLinkInfoToSettings };

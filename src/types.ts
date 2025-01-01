@@ -1,4 +1,4 @@
-import { Dirent } from "fs";
+import { Dirent } from 'fs';
 
 export interface ISourceOutputFoldersContent {
   sourceDirFiles: Record<string, Dirent>;
@@ -7,6 +7,15 @@ export interface ISourceOutputFoldersContent {
 
 export interface IIconProps {
   className?: React.SVGProps<SVGSVGElement>['className'];
+}
+
+export interface FileEntry {
+  name: string;
+  path: string;
+  parentPath: string;
+  isDirectory: boolean;
+  isFile: boolean;
+  isSymbolicLink: boolean;
 }
 
 export interface LinkedFolder {
@@ -22,4 +31,15 @@ export interface LinkedFolder {
   filesMissingFromBoth: string[];
   allFolderItemsSynced: boolean;
   timeSynced: number;
+}
+
+export interface ISymLinkedSettingsFolder {
+  sourceDir: string;
+  outputDir: string;
+  allFolderItemsSynced: boolean;
+  fileNames: string[];
+  lastSyncedTime: number;
+}
+export interface ISymLinkSettings {
+  linkedFiles: Record<string, ISymLinkedSettingsFolder>;
 }
