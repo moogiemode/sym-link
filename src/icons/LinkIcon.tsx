@@ -1,7 +1,7 @@
 import { IIconProps } from '@/types';
 import { FC } from 'react';
 
-export const LinkIcon: FC<IIconProps> = ({ className = 'size-6' }) => {
+export const LinkIcon: FC<IIconProps> = ({ className = 'size-6 stroke-accent' }) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
       <path
