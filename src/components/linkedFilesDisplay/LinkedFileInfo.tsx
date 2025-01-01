@@ -4,8 +4,21 @@ import { LinkedFolder } from '@/types';
 import { FC } from 'react';
 
 export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ linkedFile }) => {
-  const { dirKey, sourceDirName, outputDirName, sourceDirPath, outputDirPath, filesSynced, filesMissingFromSource, filesMissingFromOutput, filesMissingFromBoth, filesInOutputNoLongerSymLinks, timeSynced } =
-    typeof linkedFile === 'string' ? {} : linkedFile;
+  const {
+    dirKey,
+    linkedFiles,
+    sourceDirName,
+    outputDirName,
+    sourceDirPath,
+    outputDirPath,
+    allFolderItemsSynced,
+    filesSynced,
+    filesMissingFromSource,
+    filesMissingFromOutput,
+    filesMissingFromBoth,
+    filesInOutputNoLongerSymLinks,
+    timeSynced,
+  } = typeof linkedFile === 'string' ? {} : linkedFile;
 
   return (
     <div className="flex items-center bg-base-200 gap-3 p-2 rounded-md">
@@ -17,17 +30,21 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
         </div>
       </div>
       <div>
-        <div className="flex items-center gap-3">
-          <div className="font-bold">{sourceDirName}</div>
-          <ArrowRightIcon className="size-6" />
-          <div className="font-bold">{outputDirName}</div>
-        </div>
-        <div className="text-sm opacity-50">{`${sourceDirPath} → ${outputDirPath}`}</div>
-        <div>
-          <div className="flex items-end">
-            <div className="text-sm opacity-75">Last Synced On: {new Date(timeSynced).toLocaleString()}</div>
-            <div className="text-xs opacity-50">{outputDirPath}</div>
+        <div className="flex items-center gap-3 justify-between">
+          <div className="flex items-center gap-3">
+            <div className="font-bold">{sourceDirName}</div>
+            <ArrowRightIcon className="size-6" />
+            <div className="font-bold">{outputDirName}</div>
           </div>
+          <div className="flex items-center gap-2">
+            <div className={`badge badge-primary ${allFolderItemsSynced ? '' : 'badge-outline'}`}>{allFolderItemsSynced ? 'full' : 'partial'}</div>
+            <div className="badge badge-accent">{linkedFiles.length}</div>
+          </div>
+        </div>
+        <div className="text-sm opacity-75">{`${sourceDirPath} → ${outputDirPath}`}</div>
+        <div className="flex items-end justify-between gap-3 items-center">
+          <div className="text-sm opacity-40">Last Synced: {new Date(timeSynced).toLocaleString()}</div>
+          <div className="text-xs opacity-50 text-success">Sync Status: All Good</div>
         </div>
       </div>
     </div>

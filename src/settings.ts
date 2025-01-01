@@ -68,6 +68,7 @@ const getLinkedFolderFromSettings: (linkKey: string, linkValue: ISymLinkedSettin
 
   const linkedFolder: LinkedFolder = {
     dirKey: linkKey,
+    linkedFiles: linkValue.fileNames,
     sourceDirName,
     outputDirName,
     sourceDirPath: linkValue.sourceDir,
