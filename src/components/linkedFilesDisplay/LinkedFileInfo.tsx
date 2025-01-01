@@ -5,7 +5,8 @@ import { FC } from 'react';
 export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ linkedFile }) => {
   const { dirKey, sourceDirName, outputDirName, sourceDirPath, outputDirPath, filesSynced, filesMissingFromSource, filesMissingFromOutput, filesMissingFromBoth, filesInOutputNoLongerSymLinks, timeSynced } =
     typeof linkedFile === 'string' ? {} : linkedFile;
-  return (
+
+    return (
     <div className="flex items-center gap-3">
       <div className="avatar size-14 bg-success mask mask-squircle">
         <div>
@@ -21,7 +22,7 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
         <div className="text-sm opacity-50">{`${sourceDirPath} → ${outputDirPath}`}</div>
         <div>
           <div className="flex items-end">
-            <div className="text-sm opacity-75">Last Synced On: </div>
+            <div className="text-sm opacity-75">Last Synced On: {new Date(timeSynced).toLocaleString()}</div>
             <div className="text-xs opacity-50">{outputDirPath}</div>
           </div>
         </div>

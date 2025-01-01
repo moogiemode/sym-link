@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   saveSettings: (key: string, value: unknown) => ipcRenderer.invoke('save-settings', key, value),
   getSettings: (key: string) => ipcRenderer.invoke('get-settings', key),
+  clearSettings: () => ipcRenderer.invoke('clear-settings'),
 });
 
 // Add this type declaration in your renderer TypeScript file
@@ -45,6 +46,7 @@ declare global {
 
       saveSettings: <K extends keyof ISymLinkSettings>(key: K, value: ISymLinkSettings[K]) => Promise<void>;
       getSettings: <K extends keyof ISymLinkSettings>(key: K) => Promise<ISymLinkSettings[K] | null>;
+      clearSettings: () => Promise<void>;
     };
   }
 }

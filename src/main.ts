@@ -82,6 +82,11 @@ const createWindow = () => {
     }
   });
 
+  ipcMain.handle('clear-settings', async () => {
+    const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);
+    await writeFile(settingsPath, '{}');
+  });
+
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
