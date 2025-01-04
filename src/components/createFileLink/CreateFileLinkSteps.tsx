@@ -1,11 +1,10 @@
 import { createSymLinks, removeFilesToIgnore } from '@/utils';
-import { Dirent } from 'fs';
-// import { DirEntry, readDir } from '@tauri-apps/plugin-fs';
 import { FC, useState } from 'react';
 import { CreateFileLinkStepsCreate } from './CreateFileLinkStepsCreate';
 import { CreateFileLinkStepsOutput } from './CreateFileLinkStepsOutput';
 import { CreateFileLinkStepsSelect } from './CreateFileLinkStepsSelect/CreateFileLinkStepsSelect';
 import { CreateFileLinkStepsSource } from './CreateFileLinkStepsSource';
+import { FileEntry } from '@/types';
 
 interface IStep {
   label: string;
@@ -18,7 +17,7 @@ export const CreateFileLinkSteps: FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [sourceDir, setSourceDir] = useState('');
   const [outputDir, setOutputDir] = useState('');
-  const [filesToLink, setFilesToLink] = useState<Dirent[]>();
+  const [filesToLink, setFilesToLink] = useState<FileEntry[]>();
 
   const changeStep = (step: 'next' | 'prev') => {
     if (step === 'next' && currentStep < steps.length - 1) {

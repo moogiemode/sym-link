@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, writeFile, unlink, rm, lstat } from 'fs/promises';
+import { access, mkdir, readFile, writeFile, unlink, rm, lstat, symlink } from 'fs/promises';
 import { app } from 'electron';
 
 import { ISymLinkedSettingsFolder, ISymLinkSettings } from './types';
@@ -80,3 +80,18 @@ export async function ipcDeleteLinkInfo(_: Electron.IpcMainInvokeEvent, linkKey:
     }
   });
 }
+
+/**
+ * Add symlinks to the output folder for the given linked folder.
+ * @param key The key of the linked folder in the settings.
+ * @param fileNamesToAdd The names of the files to link.
+ * @returns The updated linked folder info.
+ */
+export const ipcAddSymlinks = async (_: Electron.IpcMainInvokeEvent, key: string, fileNamesToAdd: string[]) => {
+  const linkInfo = await ipcGetLinkInfo(null, key);
+
+  await Promise.all(fileNamesToAdd.map(async fileName => await symlink(path.join(linkInfo.sourceDir, fileName), path.join(linkInfo.outputDir, fileName)).then(() => linkInfo.fileNames.push(fileName))));
+
+  return await ipcSaveLinkInfo(null, key, linkInfo);
+};
+/// await symlink(sourcePath, linkPath)

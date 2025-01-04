@@ -1,5 +1,4 @@
-import { getLinkedFilesSettingsKey, getLinkedFolderFromSettings } from './settings';
-import { Dirent } from 'fs';
+import { getLinkedFilesSettingsKey, getLinkedFolderStats } from './settings';
 import { useSymLinkStore } from './store';
 import { FileEntry } from './types';
 
@@ -50,7 +49,7 @@ export const dirExists = async (dirPath: string) => {
 };
 
 // POTENTIAL FOR OPTIMIZATION AS LARGE NUMBER OF FILES MAY REACH THE LIMIT. SUGGESTION - USE BATCHES OF 100 FILES
-export const createSymLinks = async ({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }: { sourceDir: string; outputDir: string; filesToLink: Dirent[]; allFolderItemsSynced: boolean }) => {
+export const createSymLinks = async ({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }: { sourceDir: string; outputDir: string; filesToLink: FileEntry[]; allFolderItemsSynced: boolean }) => {
   const fileNames: string[] = [];
 
   await Promise.all(
@@ -61,8 +60,13 @@ export const createSymLinks = async ({ sourceDir, outputDir, filesToLink, allFol
     }),
   )
     .then(async () => await window.electronAPI.saveLinkInfo(getLinkedFilesSettingsKey(sourceDir, outputDir), { sourceDir, outputDir, fileNames, allFolderItemsSynced, lastSyncedTime: Date.now() }))
-    .then(async linkValue => useSymLinkStore.getState().setLinkedFile(await getLinkedFolderFromSettings(linkValue)))
+    .then(async linkValue => useSymLinkStore.getState().setLinkedFile(await getLinkedFolderStats(linkValue)))
     .catch(err => console.error(`Error creating symlink: ${err}`));
+};
+
+export const addSymLinks = async ({ key, fileNamesToLink }: { key: string; fileNamesToLink: string[] }) => {
+  const linkedFolderSettings = await window.electronAPI.addSymLinks(key, fileNamesToLink);
+  useSymLinkStore.getState().setLinkedFile(await getLinkedFolderStats(linkedFolderSettings));
 };
 
 export const deleteSymLinks = async ({ sourceDir, outputDir, linkFileNames }: { sourceDir: string; outputDir: string; linkFileNames?: string[] }) => {
@@ -71,7 +75,7 @@ export const deleteSymLinks = async ({ sourceDir, outputDir, linkFileNames }: { 
     if (typeof res === 'string') {
       useSymLinkStore.getState().deleteLinkedFile(res);
     } else {
-      useSymLinkStore.getState().setLinkedFile(await getLinkedFolderFromSettings(res));
+      useSymLinkStore.getState().setLinkedFile(await getLinkedFolderStats(res));
     }
   });
 };

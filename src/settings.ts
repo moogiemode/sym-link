@@ -7,7 +7,7 @@ const delimiter = '::';
 
 export const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) => [sourceDir, outputDir].join(delimiter);
 
-export const getLinkedFolderFromSettings: (symLinkedSetting: ISymLinkedSettingsFolder) => Promise<LinkedFolder | string> = async (symLinkedSetting) => {
+export const getLinkedFolderStats: (symLinkedSetting: ISymLinkedSettingsFolder) => Promise<LinkedFolder> = async symLinkedSetting => {
   const sourceDirFiles = window.electronAPI.readDirectory(symLinkedSetting.sourceDir);
   const outputDirFiles = window.electronAPI.readDirectory(symLinkedSetting.outputDir);
 
@@ -21,6 +21,9 @@ export const getLinkedFolderFromSettings: (symLinkedSetting: ISymLinkedSettingsF
   const filesMissingFromSource: string[] = [];
   const filesMissingFromOutput: string[] = [];
   const filesMissingFromBoth: string[] = [];
+  const filesInSourceNotSynced: string[] = [];
+  const sourceFolderFiles = Object.values(sourceFiles);
+  const outputFolderFiles = Object.values(outputFiles);
 
   for (const fileName of symLinkedSetting.fileNames) {
     const sourceFile = sourceFiles[fileName];
@@ -39,6 +42,11 @@ export const getLinkedFolderFromSettings: (symLinkedSetting: ISymLinkedSettingsF
     } else if (outputFile) {
       filesMissingFromSource.push(fileName);
     }
+    delete sourceFiles[fileName];
+  }
+
+  for (const fileName in sourceFiles) {
+    filesInSourceNotSynced.push(fileName);
   }
 
   const [sourceDirName, outputDirName] = await Promise.all([symLinkedSetting.sourceDir, symLinkedSetting.outputDir].map(async path => await window.electronAPI.pathBasename(path)));
@@ -50,6 +58,8 @@ export const getLinkedFolderFromSettings: (symLinkedSetting: ISymLinkedSettingsF
     outputDirName,
     sourceDirPath: symLinkedSetting.sourceDir,
     outputDirPath: symLinkedSetting.outputDir,
+    sourceFolderFiles,
+    outputFolderFiles,
     allFolderItemsSynced: symLinkedSetting.allFolderItemsSynced,
     timeSynced: symLinkedSetting.lastSyncedTime,
     filesSynced,
@@ -57,6 +67,7 @@ export const getLinkedFolderFromSettings: (symLinkedSetting: ISymLinkedSettingsF
     filesMissingFromSource,
     filesMissingFromOutput,
     filesMissingFromBoth,
+    filesInSourceNotSynced,
   };
 
   return linkedFolder;
@@ -66,7 +77,7 @@ const getAllLinkedFoldersFromSettings = async () => {
   const linkedFiles = await window.electronAPI.getSettings('linkedFiles');
   if (!linkedFiles) return null;
 
-  const linkedFolders = Object.values(linkedFiles).map(symLinkedSetting => getLinkedFolderFromSettings(symLinkedSetting));
+  const linkedFolders = Object.values(linkedFiles).map(symLinkedSetting => getLinkedFolderStats(symLinkedSetting));
   return Promise.all(linkedFolders);
 };
 

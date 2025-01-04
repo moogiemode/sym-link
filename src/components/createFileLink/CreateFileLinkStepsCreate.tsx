@@ -4,11 +4,11 @@ import { SparklesIcon } from '@/icons/SparklesIcon';
 import { FC, useState } from 'react';
 import { ModalTopSectionContainer } from './ModalTopSectionContainer';
 import { StepsNavButtons } from './StepsNavButtons';
-import { Dirent } from 'fs';
+import { FileEntry } from '@/types';
 
 interface CreateFileLinkStepsCreateProps {
   changeStep: (step: 'next' | 'prev') => void;
-  filesToLink?: Dirent[];
+  filesToLink?: FileEntry[];
   createFileLinks: () => Promise<void>;
 }
 export const CreateFileLinkStepsCreate: FC<CreateFileLinkStepsCreateProps> = ({ changeStep, filesToLink, createFileLinks }) => {

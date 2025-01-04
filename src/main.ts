@@ -3,7 +3,7 @@ import path from 'path';
 import { readdir, readlink, symlink, writeFile } from 'fs/promises';
 import started from 'electron-squirrel-startup';
 import { FileEntry } from './types';
-import { ipcDeleteLinkInfo, ipcEnsureDirectory, ipcGetLinkInfo, ipcGetSettings, ipcSaveLinkInfo, ipcSaveSettings } from './ipcHandlerUtils';
+import { ipcAddSymlinks, ipcDeleteLinkInfo, ipcEnsureDirectory, ipcGetLinkInfo, ipcGetSettings, ipcSaveLinkInfo, ipcSaveSettings } from './ipcHandlerUtils';
 
 export const symLinkAppDataFolderName = 'SymLink';
 export const symLinkSettingsFileName = 'settings.json';
@@ -63,6 +63,9 @@ const createWindow = () => {
   ipcMain.handle('read-link', async (_, linkPath: string) => await readlink(linkPath, 'utf-8'));
 
   ipcMain.handle('sym-link', async (_, sourcePath: string, linkPath: string) => await symlink(sourcePath, linkPath));
+
+  ipcMain.handle('add-sym-links', async (_, key: string, fileNamesToAdd: string[]) => await ipcAddSymlinks(null, key, fileNamesToAdd));
+
   ipcMain.handle('ensure-directory', async (_, dirPath: string, allowCreate?: boolean) => await ipcEnsureDirectory(dirPath, allowCreate));
 
   ipcMain.handle('save-settings', ipcSaveSettings);

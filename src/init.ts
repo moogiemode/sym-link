@@ -6,10 +6,10 @@ const linkedFolders = await getAllLinkedFoldersFromSettings().then(folders => {
   // if (!folders) return folders;
   return folders.reduce(
     (acc, folder) => {
-      acc[typeof folder === 'string' ? folder : folder.dirKey] = folder;
+      acc[folder.dirKey] = folder;
       return acc;
     },
-    {} as Record<string, LinkedFolder | string>,
+    {} as Record<string, LinkedFolder>,
   );
 });
 if (linkedFolders) {

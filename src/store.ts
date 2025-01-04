@@ -3,12 +3,12 @@ import { immer } from 'zustand/middleware/immer';
 import { LinkedFolder } from './types';
 
 interface State {
-  linkedFiles: Record<string, string | LinkedFolder>;
+  linkedFiles: Record<string, LinkedFolder>;
 }
 
 interface Actions {
-  setAllLinkedFiles: (linkedFiles: Record<string, string | LinkedFolder>) => void;
-  setLinkedFile: (linkedFile: string | LinkedFolder) => void;
+  setAllLinkedFiles: (linkedFiles: Record<string, LinkedFolder>) => void;
+  setLinkedFile: (linkedFile: LinkedFolder) => void;
   deleteLinkedFile: (dirKey: string) => void;
 }
 
@@ -22,7 +22,7 @@ export const useSymLinkStore = create<State & Actions>()(
     },
     setLinkedFile: linkedFile => {
       set(state => {
-        state.linkedFiles[typeof linkedFile === 'string' ? linkedFile : linkedFile.dirKey] = linkedFile;
+        state.linkedFiles[linkedFile.dirKey] = linkedFile;
       });
     },
     deleteLinkedFile: dirKey => {

@@ -1,26 +1,12 @@
 import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 import { LinkIcon } from '@/icons/LinkIcon';
-import { ISymLinkedSettingsFolder, LinkedFolder } from '@/types';
-import { createSymLinks, deleteSymLinks } from '@/utils';
-import { FC, useEffect, useRef, useState } from 'react';
+import { LinkedFolder } from '@/types';
+import { deleteSymLinks } from '@/utils';
+import { FC, useRef, useState } from 'react';
 import { AddLinksModalContent } from './AddLinksModalContent';
 
 export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ linkedFile }) => {
-  const {
-    dirKey,
-    linkedFiles,
-    sourceDirName,
-    outputDirName,
-    sourceDirPath,
-    outputDirPath,
-    allFolderItemsSynced,
-    filesSynced,
-    filesMissingFromSource,
-    filesMissingFromOutput,
-    filesMissingFromBoth,
-    filesInOutputNoLongerSymLinks,
-    timeSynced,
-  } = typeof linkedFile === 'string' ? {} : linkedFile;
+  const { dirKey, linkedFiles, sourceDirName, outputDirName, sourceDirPath, outputDirPath, allFolderItemsSynced, filesSynced, timeSynced } = typeof linkedFile === 'string' ? {} : linkedFile;
 
   const menuRef = useRef<HTMLDetailsElement>(null);
   const modalRef = useRef<HTMLDialogElement>(null);
@@ -34,10 +20,10 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
-  const refreshLinks = async () => {
-    await createSymLinks({ sourceDir: sourceDirPath, outputDir: outputDirPath, filesToLink: [], allFolderItemsSynced });
-    menuRef.current.open = false;
-  };
+  // const refreshLinks = async () => {
+  //   await createSymLinks({ sourceDir: sourceDirPath, outputDir: outputDirPath, filesToLink: [], allFolderItemsSynced });
+  //   menuRef.current.open = false;
+  // };
 
   const deleteLinks = async () => {
     await deleteSymLinks({ sourceDir: sourceDirPath, outputDir: outputDirPath });
@@ -94,9 +80,9 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
           </div>
         </summary>
         <ul tabIndex={0} className="dropdown-content menu bg-base-300 rounded-md z-[1] w-52 p-2 shadow">
-          <li>
+          {/* <li>
             <button onClick={refreshLinks}>Refresh</button>
-          </li>
+          </li> */}
           <li>
             <button onClick={deleteLinks}>Delete</button>
           </li>
@@ -112,7 +98,7 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
               ✕
             </button>
           </form>
-          {modalOpen && <AddLinksModalContent sourceDirPath={sourceDirPath} outputDirPath={outputDirPath} />}
+          {modalOpen && <AddLinksModalContent dirKey={dirKey} onModalClose={onAddLinkModalClose} />}
         </div>
         <form method="dialog" className="modal-backdrop">
           <button onClick={onAddLinkModalClose}>close</button>
