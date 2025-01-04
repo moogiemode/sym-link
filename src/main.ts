@@ -1,8 +1,8 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
-import { readdir, readFile, readlink, symlink, writeFile } from 'fs/promises';
+import { readdir, readlink, symlink, writeFile } from 'fs/promises';
 import started from 'electron-squirrel-startup';
-import { FileEntry, ISymLinkSettings } from './types';
+import { FileEntry } from './types';
 import { ipcDeleteLinkInfo, ipcEnsureDirectory, ipcGetLinkInfo, ipcGetSettings, ipcSaveLinkInfo, ipcSaveSettings } from './ipcHandlerUtils';
 
 export const symLinkAppDataFolderName = 'SymLink';

@@ -1,5 +1,6 @@
-import { getLinkedFilesSettingsKey } from './settings';
+import { getLinkedFilesSettingsKey, getLinkedFolderFromSettings } from './settings';
 import { Dirent } from 'fs';
+import { useSymLinkStore } from './store';
 
 const pathJoin = window.electronAPI.pathJoin;
 const pathResolve = window.electronAPI.pathResolve;
@@ -59,10 +60,17 @@ export const createSymLinks = async ({ sourceDir, outputDir, filesToLink, allFol
     }),
   )
     .then(async () => await window.electronAPI.saveLinkInfo(getLinkedFilesSettingsKey(sourceDir, outputDir), { sourceDir, outputDir, fileNames, allFolderItemsSynced, lastSyncedTime: Date.now() }))
+    .then(async linkValue => useSymLinkStore.getState().setLinkedFile(await getLinkedFolderFromSettings(linkValue)))
     .catch(err => console.error(`Error creating symlink: ${err}`));
 };
 
 export const deleteSymLinks = async ({ sourceDir, outputDir, linkFileNames }: { sourceDir: string; outputDir: string; linkFileNames?: string[] }) => {
   const settingsKey = getLinkedFilesSettingsKey(sourceDir, outputDir);
-  window.electronAPI.deleteLinkInfo(settingsKey, linkFileNames);
+  window.electronAPI.deleteLinkInfo(settingsKey, linkFileNames).then(async res => {
+    if (typeof res === 'string') {
+      useSymLinkStore.getState().deleteLinkedFile(res);
+    } else {
+      useSymLinkStore.getState().setLinkedFile(await getLinkedFolderFromSettings(res));
+    }
+  });
 };

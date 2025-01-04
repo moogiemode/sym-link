@@ -49,9 +49,9 @@ declare global {
 
       saveSettings: <K extends keyof ISymLinkSettings>(key: K, value: ISymLinkSettings[K]) => Promise<void>;
       getSettings: <K extends keyof ISymLinkSettings>(key: K) => Promise<ISymLinkSettings[K] | null>;
-      saveLinkInfo: (linkKey: string, linkValue: ISymLinkedSettingsFolder) => Promise<void>;
+      saveLinkInfo: (linkKey: string, linkValue: ISymLinkedSettingsFolder) => Promise<ISymLinkedSettingsFolder>;
       getLinkInfo: (linkKey: string) => Promise<ISymLinkedSettingsFolder | null>;
-      deleteLinkInfo: (linkKey: string, linkFileNames?: string[]) => Promise<void>;
+      deleteLinkInfo: (linkKey: string, linkFileNames?: string[]) => Promise<string | ISymLinkedSettingsFolder>;
 
       clearSettings: () => Promise<void>;
     };

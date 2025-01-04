@@ -9,6 +9,7 @@ interface State {
 interface Actions {
   setAllLinkedFiles: (linkedFiles: Record<string, string | LinkedFolder>) => void;
   setLinkedFile: (linkedFile: string | LinkedFolder) => void;
+  deleteLinkedFile: (dirKey: string) => void;
 }
 
 export const useSymLinkStore = create<State & Actions>()(
@@ -22,6 +23,11 @@ export const useSymLinkStore = create<State & Actions>()(
     setLinkedFile: linkedFile => {
       set(state => {
         state.linkedFiles[typeof linkedFile === 'string' ? linkedFile : linkedFile.dirKey] = linkedFile;
+      });
+    },
+    deleteLinkedFile: dirKey => {
+      set(state => {
+        delete state.linkedFiles[dirKey];
       });
     },
   })),

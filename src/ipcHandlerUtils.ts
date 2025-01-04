@@ -41,7 +41,7 @@ export async function ipcGetSettings<K extends keyof ISymLinkSettings>(_: Electr
 export async function ipcSaveLinkInfo(_: Electron.IpcMainInvokeEvent, linkKey: string, linkValue: ISymLinkedSettingsFolder) {
   const linkedSettings = (await ipcGetSettings(null, 'linkedFiles')) || {};
   linkedSettings[linkKey] = linkValue;
-  await ipcSaveSettings(null, 'linkedFiles', linkedSettings);
+  return await ipcSaveSettings(null, 'linkedFiles', linkedSettings).then(() => linkValue);
 }
 
 export async function ipcGetLinkInfo(_: Electron.IpcMainInvokeEvent, linkKey: string) {
@@ -50,9 +50,6 @@ export async function ipcGetLinkInfo(_: Electron.IpcMainInvokeEvent, linkKey: st
 }
 
 export async function ipcDeleteLinkInfo(_: Electron.IpcMainInvokeEvent, linkKey: string, linkFileNames?: string[]) {
-  /*
-    delete all links in this file that are tied to the key while not deleting some that may have come from other sources
-  */
   const linkedFolderInfo = await ipcGetLinkInfo(null, linkKey);
   const fileNamesSet = linkFileNames ? new Set(linkedFolderInfo.fileNames) : null; // creating a set here because if file names have been passed we need to do selective deletion
 
@@ -70,14 +67,16 @@ export async function ipcDeleteLinkInfo(_: Electron.IpcMainInvokeEvent, linkKey:
 
   const linkedFilesToDelete = (linkFileNames || linkedFolderInfo.fileNames).map(unlinkFile);
 
-  await Promise.all(linkedFilesToDelete).then(async () => {
+  return await Promise.all(linkedFilesToDelete).then(async () => {
     if (fileNamesSet) {
       linkedFolderInfo.fileNames = Array.from(fileNamesSet);
       await ipcSaveLinkInfo(null, linkKey, linkedFolderInfo);
+      return linkedFolderInfo;
     } else {
       const linkedSettings = (await ipcGetSettings(null, 'linkedFiles')) || {};
       delete linkedSettings[linkKey];
       await ipcSaveSettings(null, 'linkedFiles', linkedSettings);
+      return linkKey;
     }
   });
 }
