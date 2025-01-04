@@ -1,34 +1,11 @@
-import { Dirent } from 'fs';
 import { ISymLinkedSettingsFolder, LinkedFolder } from './types';
 import { arrayToObject, removeFilesToIgnore } from './utils';
 
 // const settings = await load('settings.json', { autoSave: false });
 
-const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) => [sourceDir, outputDir].join(':');
+const delimiter = '::';
 
-const saveLinkInfoToSettings = async ({
-  sourceDir,
-  outputDir,
-  filesToLink,
-  allFolderItemsSynced,
-}: {
-  sourceDir: string;
-  outputDir: string;
-  filesToLink: Dirent[];
-  allFolderItemsSynced: LinkedFolder['allFolderItemsSynced'];
-}) => {
-  const linkedFileObj: ISymLinkedSettingsFolder = {
-    sourceDir,
-    outputDir,
-    allFolderItemsSynced,
-    fileNames: filesToLink.map(fileEntry => fileEntry.name),
-    lastSyncedTime: Date.now(),
-  };
-
-  const linkedFiles = await window.electronAPI.getSettings('linkedFiles');
-  await window.electronAPI.saveSettings('linkedFiles', { ...linkedFiles, [getLinkedFilesSettingsKey(sourceDir, outputDir)]: linkedFileObj });
-  // settings.save();
-};
+export const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) => [sourceDir, outputDir].join(delimiter);
 
 const getLinkedFolderFromSettings: (linkKey: string, linkValue: ISymLinkedSettingsFolder) => Promise<LinkedFolder | string> = async (linkKey, linkValue) => {
   const sourceDirFiles = window.electronAPI.readDirectory(linkValue.sourceDir);
@@ -93,4 +70,4 @@ const getAllLinkedFoldersFromSettings = async () => {
   return Promise.all(linkedFolders);
 };
 
-export { getAllLinkedFoldersFromSettings, saveLinkInfoToSettings };
+export { getAllLinkedFoldersFromSettings };

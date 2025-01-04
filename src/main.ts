@@ -2,11 +2,11 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
 import { readdir, readFile, readlink, symlink, writeFile } from 'fs/promises';
 import started from 'electron-squirrel-startup';
-import { ensureDirectory } from './ipcHandlerUtils';
-import { FileEntry } from './types';
+import { FileEntry, ISymLinkSettings } from './types';
+import { ipcDeleteLinkInfo, ipcEnsureDirectory, ipcGetSettings, ipcSaveLinkInfo, ipcSaveSettings } from './ipcHandlerUtils';
 
-const symLinkAppDataFolderName = 'SymLink';
-const symLinkSettingsFileName = 'settings.json';
+export const symLinkAppDataFolderName = 'SymLink';
+export const symLinkSettingsFileName = 'settings.json';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -63,24 +63,15 @@ const createWindow = () => {
   ipcMain.handle('read-link', async (_, linkPath: string) => await readlink(linkPath, 'utf-8'));
 
   ipcMain.handle('sym-link', async (_, sourcePath: string, linkPath: string) => await symlink(sourcePath, linkPath));
-  ipcMain.handle('ensure-directory', async (_, dirPath: string, allowCreate?: boolean) => await ensureDirectory(dirPath, allowCreate));
+  ipcMain.handle('ensure-directory', async (_, dirPath: string, allowCreate?: boolean) => await ipcEnsureDirectory(dirPath, allowCreate));
 
-  ipcMain.handle('save-settings', async (_, key: string, value: unknown) => {
-    const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);
-    await ensureDirectory(path.dirname(settingsPath), true);
-    const settingsObj = JSON.parse(await readFile(settingsPath, 'utf-8')) || {};
-    settingsObj[key] = value;
-    await writeFile(settingsPath, JSON.stringify(settingsObj, null, 2));
-  });
+  ipcMain.handle('save-settings', ipcSaveSettings);
 
-  ipcMain.handle('get-settings', async (_, key: string) => {
-    try {
-      const settings = JSON.parse(await readFile(path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName), 'utf-8'));
-      return settings[key];
-    } catch {
-      return null;
-    }
-  });
+  ipcMain.handle('get-settings', ipcGetSettings);
+
+  ipcMain.handle('save-link-info', ipcSaveLinkInfo);
+
+  ipcMain.handle('delete-link-info', ipcDeleteLinkInfo);
 
   ipcMain.handle('clear-settings', async () => {
     const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);

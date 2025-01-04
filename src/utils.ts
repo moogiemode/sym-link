@@ -1,4 +1,4 @@
-import { saveLinkInfoToSettings } from './settings';
+import { getLinkedFilesSettingsKey } from './settings';
 import { Dirent } from 'fs';
 
 const pathJoin = window.electronAPI.pathJoin;
@@ -50,7 +50,15 @@ export const dirExists = async (dirPath: string) => {
 // POTENTIAL FOR OPTIMIZATION AS LARGE NUMBER OF FILES MAY REACH THE LIMIT. SUGGESTION - USE BATCHES OF 100 FILES
 export const createSymLinks = async ({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }: { sourceDir: string; outputDir: string; filesToLink: Dirent[]; allFolderItemsSynced: boolean }) => {
   console.log(await Promise.all(filesToLink.map(async file => ({ origin: await pathJoin(sourceDir, file.name), link: await pathJoin(outputDir, file.name) }))));
-  await Promise.all(filesToLink.map(async file => window.electronAPI.symLink(await pathJoin(sourceDir, file.name), await pathJoin(outputDir, file.name))))
-    .then(async () => await saveLinkInfoToSettings({ sourceDir, outputDir, filesToLink, allFolderItemsSynced }))
-    .catch(err => console.error(`Error creating symlink EDWIN: ${err}`));
+  const fileNames: string[] = [];
+
+  await Promise.all(
+    filesToLink.map(async file => {
+      fileNames.push(file.name); // Add file name to list of files to link
+
+      return window.electronAPI.symLink(await pathJoin(sourceDir, file.name), await pathJoin(outputDir, file.name));
+    }),
+  )
+    .then(async () => await window.electronAPI.saveLinkInfo(getLinkedFilesSettingsKey(sourceDir, outputDir), { sourceDir, outputDir, fileNames, allFolderItemsSynced, lastSyncedTime: Date.now() }))
+    .catch(err => console.error(`Error creating symlink: ${err}`));
 };

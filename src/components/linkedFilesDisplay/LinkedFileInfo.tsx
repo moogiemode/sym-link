@@ -54,7 +54,10 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
           <div className="text-sm opacity-75">{`${sourceDirPath} → ${outputDirPath}`}</div>
           <div className="flex justify-between gap-3 items-center">
             <div className="text-sm opacity-40">Last Synced: {new Date(timeSynced).toLocaleString()}</div>
-            <div className={`text-xs opacity-50 ${syncStatus.className}`}>Sync Status: {syncStatus.text}</div>
+            <div className={`flex text-xs opacity-50 prose`}>
+              <div>Sync Status:&nbsp;</div>
+              <div className={syncStatus.className}>{syncStatus.text}</div>
+            </div>
           </div>
         </div>
       </div>
