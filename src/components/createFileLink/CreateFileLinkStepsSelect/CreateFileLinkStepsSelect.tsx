@@ -1,16 +1,15 @@
-import { ISourceOutputFoldersContent } from '@/types';
+import { FileEntry, ISourceOutputFoldersContent } from '@/types';
 import { arrayToObject, removeFilesToIgnore } from '@/utils';
 import { FC, useEffect, useRef, useState } from 'react';
 import { ModalTopSectionContainer } from '../ModalTopSectionContainer';
 import { StepsNavButtons } from '../StepsNavButtons';
 import { CreateFileLinkStepsSelectTable } from './CreateFileLinkStepsSelectTable';
-import { Dirent } from 'fs';
 
 interface CreateFileLinkStepsSelectProps {
   sourceDir: string;
   outputDir: string;
-  filesToLink?: Dirent[];
-  setFilesToLink: (files: Dirent[]) => void;
+  filesToLink?: FileEntry[];
+  setFilesToLink: (files: FileEntry[]) => void;
   changeStep: (step: 'next' | 'prev') => void;
 }
 

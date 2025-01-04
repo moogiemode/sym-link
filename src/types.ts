@@ -1,8 +1,6 @@
-import { Dirent } from 'fs';
-
 export interface ISourceOutputFoldersContent {
-  sourceDirFiles: Record<string, Dirent>;
-  outputDirFiles: Record<string, Dirent>;
+  sourceDirFiles: Record<string, FileEntry>;
+  outputDirFiles: Record<string, FileEntry>;
 }
 
 export interface IIconProps {

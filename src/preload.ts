@@ -2,8 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from 'electron/renderer';
-import { Dirent } from 'fs';
-import { ISymLinkedSettingsFolder, ISymLinkSettings } from './types';
+import { FileEntry, ISymLinkedSettingsFolder, ISymLinkSettings } from './types';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   setTitle: (title: string) => ipcRenderer.send('set-title', title),
@@ -41,7 +40,7 @@ declare global {
       pathBasename: (path: string) => Promise<string>;
 
       openDialog: () => Promise<string>;
-      readDirectory: (dirPath: string) => Promise<Dirent[]>;
+      readDirectory: (dirPath: string) => Promise<FileEntry[]>;
       readLink: (linkPath: string) => Promise<string>;
 
       symLink: (sourcePath: string, linkPath: string) => Promise<void>;

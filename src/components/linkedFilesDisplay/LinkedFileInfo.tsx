@@ -50,9 +50,19 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
     menuRef.current.open = false;
   };
 
+  const onAddLinkModalClose = () => {
+    setModalOpen(false);
+    // (document.getElementById('add-links-modal') as HTMLFormElement).close();
+  };
+
+  const onDropdownBlur = () =>
+    setTimeout(() => {
+      if (menuRef.current) menuRef.current.open = false;
+    }, 1000);
+
   return (
     <>
-      <details className="dropdown dropdown-bottom dropdown-end" ref={menuRef} onBlur={() => setTimeout(() => (menuRef.current.open = false), 1000)}>
+      <details className="dropdown dropdown-bottom dropdown-end" ref={menuRef} onBlur={onDropdownBlur}>
         <summary className="flex items-center bg-base-200 gap-3 p-2 rounded-md hover:bg-base-300" tabIndex={0} role="button">
           <div className="avatar size-14 bg-base-300 mask mask-squircle">
             <div>
@@ -98,14 +108,14 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
       <dialog id="add-links-modal" className="modal" ref={modalRef}>
         <div className="modal-box p-8 overflow-hidden  flex flex-col gap-8 h-full">
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 focus:outline-none" onClick={() => setModalOpen(false)}>
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 focus:outline-none" onClick={onAddLinkModalClose}>
               ✕
             </button>
           </form>
           {modalOpen && <AddLinksModalContent sourceDirPath={sourceDirPath} outputDirPath={outputDirPath} />}
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button onClick={() => setModalOpen(false)}>close</button>
+          <button onClick={onAddLinkModalClose}>close</button>
         </form>
       </dialog>
     </>

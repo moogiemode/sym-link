@@ -1,6 +1,7 @@
 import { getLinkedFilesSettingsKey, getLinkedFolderFromSettings } from './settings';
 import { Dirent } from 'fs';
 import { useSymLinkStore } from './store';
+import { FileEntry } from './types';
 
 const pathJoin = window.electronAPI.pathJoin;
 const pathResolve = window.electronAPI.pathResolve;
@@ -30,7 +31,7 @@ export const checkLinkTarget: (symlinkPath: string, originPath: string) => Promi
   }
 };
 
-export function removeFilesToIgnore<T extends string | Dirent>(files: T[]): T[] {
+export function removeFilesToIgnore<T extends string | FileEntry>(files: T[]): T[] {
   return files.filter(file => {
     if (typeof file === 'string') {
       return !filesToIgnore.has(file);

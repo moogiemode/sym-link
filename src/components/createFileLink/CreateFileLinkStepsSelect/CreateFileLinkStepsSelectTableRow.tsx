@@ -1,10 +1,10 @@
 import { FileIcon } from '@/icons/FileIcon';
 import { FolderIcon } from '@/icons/FolderIcon';
-import { Dirent } from 'fs';
+import { FileEntry } from '@/types';
 import { FC } from 'react';
 
 interface CreateFileLinkStepsSelectTableRowProps {
-  file: Dirent;
+  file: FileEntry;
   disableCheckbox: boolean;
   checked: boolean;
   onChange: (checked: boolean) => void;

@@ -6,7 +6,7 @@ interface AddLinksModalContentProps {
   outputDirPath: string;
 }
 export const AddLinksModalContent: FC<AddLinksModalContentProps> = ({ sourceDirPath, outputDirPath }) => {
-  // console.log('sourceDirPath:', sourceDirPath);
+  console.log('sourceDirPath:', sourceDirPath);
   return (
     <div className="overflow-x-auto w-full">
       {/* <CreateFileLinkStepsSelectTable
