@@ -23,7 +23,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveSettings: (key: string, value: unknown) => ipcRenderer.invoke('save-settings', key, value),
   getSettings: (key: string) => ipcRenderer.invoke('get-settings', key),
   saveLinkInfo: (linkKey: string, linkValue: ISymLinkedSettingsFolder) => ipcRenderer.invoke('save-link-info', linkKey, linkValue),
-  deleteLinkInfo: (linkKey: string) => ipcRenderer.invoke('delete-link-info', linkKey),
+  getLinkInfo: (linkKey: string) => ipcRenderer.invoke('get-link-info', linkKey),
+  deleteLinkInfo: (linkKey: string, linkFileNames?: string[]) => ipcRenderer.invoke('delete-link-info', linkKey, linkFileNames),
   clearSettings: () => ipcRenderer.invoke('clear-settings'),
 });
 
@@ -49,7 +50,8 @@ declare global {
       saveSettings: <K extends keyof ISymLinkSettings>(key: K, value: ISymLinkSettings[K]) => Promise<void>;
       getSettings: <K extends keyof ISymLinkSettings>(key: K) => Promise<ISymLinkSettings[K] | null>;
       saveLinkInfo: (linkKey: string, linkValue: ISymLinkedSettingsFolder) => Promise<void>;
-      deleteLinkInfo: (linkKey: string) => Promise<void>;
+      getLinkInfo: (linkKey: string) => Promise<ISymLinkedSettingsFolder | null>;
+      deleteLinkInfo: (linkKey: string, linkFileNames?: string[]) => Promise<void>;
 
       clearSettings: () => Promise<void>;
     };

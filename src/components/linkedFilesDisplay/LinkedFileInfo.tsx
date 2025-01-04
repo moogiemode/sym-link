@@ -1,6 +1,7 @@
 import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 import { LinkIcon } from '@/icons/LinkIcon';
-import { LinkedFolder } from '@/types';
+import { ISymLinkedSettingsFolder, LinkedFolder } from '@/types';
+import { createSymLinks, deleteSymLinks } from '@/utils';
 import { FC } from 'react';
 
 export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ linkedFile }) => {
@@ -20,8 +21,6 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
     timeSynced,
   } = typeof linkedFile === 'string' ? {} : linkedFile;
 
-  console.log(linkedFile);
-
   const syncStatus =
     filesSynced.length === linkedFiles.length
       ? { className: 'text-success', text: 'All Good' }
@@ -29,9 +28,17 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
         ? { className: 'text-error', text: 'All Synced Files are Missing' }
         : { className: 'text-warning', text: 'Some Files are Missing' };
 
+  const refreshLinks = async () => {
+    await createSymLinks({ sourceDir: sourceDirPath, outputDir: outputDirPath, filesToLink: [], allFolderItemsSynced });
+  };
+
+  const deleteLinks = async () => {
+    await deleteSymLinks({ sourceDir: sourceDirPath, outputDir: outputDirPath });
+  };
+
   return (
-    <div className="dropdown dropdown-bottom dropdown-end">
-      <div className="flex items-center bg-base-200 gap-3 p-2 rounded-md hover:bg-base-300" tabIndex={0} role="button">
+    <details className="dropdown dropdown-bottom dropdown-end">
+      <summary className="flex items-center bg-base-200 gap-3 p-2 rounded-md hover:bg-base-300" tabIndex={0} role="button">
         <div className="avatar size-14 bg-base-300 mask mask-squircle">
           <div>
             <div className="flex justify-center items-center h-full w-full">
@@ -60,15 +67,15 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
             </div>
           </div>
         </div>
-      </div>
-      <ul tabIndex={0} className="dropdown-content menu bg-base-300 rounded-box z-[1] w-52 p-2 shadow">
+      </summary>
+      <ul tabIndex={0} className="dropdown-content menu bg-base-300 rounded-md z-[1] w-52 p-2 shadow">
         <li>
-          <a>Item 1</a>
+          <button onClick={refreshLinks}>Refresh</button>
         </li>
         <li>
-          <a>Item 2</a>
+          <button onClick={deleteLinks}>Delete</button>
         </li>
       </ul>
-    </div>
+    </details>
   );
 };
