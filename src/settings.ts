@@ -10,6 +10,7 @@ export const getLinkedFilesSettingsKey = (sourceDir: string, outputDir: string) 
 export const getLinkedFolderFromSettings: (symLinkedSetting: ISymLinkedSettingsFolder) => Promise<LinkedFolder | string> = async (symLinkedSetting) => {
   const sourceDirFiles = window.electronAPI.readDirectory(symLinkedSetting.sourceDir);
   const outputDirFiles = window.electronAPI.readDirectory(symLinkedSetting.outputDir);
+  console.log(symLinkedSetting);
 
   const [sourceFiles, outputFiles] = await Promise.all([sourceDirFiles, outputDirFiles]).then(([sourceFiles, outputFiles]) => [
     arrayToObject(removeFilesToIgnore(sourceFiles), 'name'),

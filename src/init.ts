@@ -12,7 +12,6 @@ const linkedFolders = await getAllLinkedFoldersFromSettings().then(folders => {
     {} as Record<string, LinkedFolder | string>,
   );
 });
-
 if (linkedFolders) {
   useSymLinkStore.getState().setAllLinkedFiles(linkedFolders);
 }

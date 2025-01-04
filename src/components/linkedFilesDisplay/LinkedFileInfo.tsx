@@ -2,7 +2,8 @@ import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 import { LinkIcon } from '@/icons/LinkIcon';
 import { ISymLinkedSettingsFolder, LinkedFolder } from '@/types';
 import { createSymLinks, deleteSymLinks } from '@/utils';
-import { FC, useRef } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
+import { AddLinksModalContent } from './AddLinksModalContent';
 
 export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ linkedFile }) => {
   const {
@@ -22,6 +23,7 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
   } = typeof linkedFile === 'string' ? {} : linkedFile;
 
   const menuRef = useRef<HTMLDetailsElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   const syncStatus =
     filesSynced.length === linkedFiles.length
@@ -29,6 +31,8 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
       : filesSynced.length === 0
         ? { className: 'text-error', text: 'All Synced Files are Missing' }
         : { className: 'text-warning', text: 'Some Files are Missing' };
+
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const refreshLinks = async () => {
     await createSymLinks({ sourceDir: sourceDirPath, outputDir: outputDirPath, filesToLink: [], allFolderItemsSynced });
@@ -41,14 +45,14 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
   };
 
   const openAddLinksModal = () => {
-    // setModalId(prev => prev + 1);
+    setModalOpen(true);
     (document.getElementById('add-links-modal') as HTMLFormElement).showModal();
     menuRef.current.open = false;
   };
 
   return (
     <>
-      <details className="dropdown dropdown-bottom dropdown-end" ref={menuRef} onBlur={() => setTimeout(() => (menuRef.current.open = false), 100)}>
+      <details className="dropdown dropdown-bottom dropdown-end" ref={menuRef} onBlur={() => setTimeout(() => (menuRef.current.open = false), 1000)}>
         <summary className="flex items-center bg-base-200 gap-3 p-2 rounded-md hover:bg-base-300" tabIndex={0} role="button">
           <div className="avatar size-14 bg-base-300 mask mask-squircle">
             <div>
@@ -91,15 +95,17 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
           </li>
         </ul>
       </details>
-      <dialog id="add-links-modal" className="modal">
+      <dialog id="add-links-modal" className="modal" ref={modalRef}>
         <div className="modal-box p-8 overflow-hidden  flex flex-col gap-8 h-full">
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 focus:outline-none">✕</button>
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 focus:outline-none" onClick={() => setModalOpen(false)}>
+              ✕
+            </button>
           </form>
-          <div>apple</div>
+          {modalOpen && <AddLinksModalContent sourceDirPath={sourceDirPath} outputDirPath={outputDirPath} />}
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button onClick={() => setModalOpen(false)}>close</button>
         </form>
       </dialog>
     </>
