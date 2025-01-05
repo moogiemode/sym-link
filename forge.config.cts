@@ -49,6 +49,19 @@ const config: ForgeConfig = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'moogiemode',
+          name: 'sym-link',
+        },
+        prerelease: false,
+        draft: true,
+      },
+    },
+  ],
 };
 
 export default config;
