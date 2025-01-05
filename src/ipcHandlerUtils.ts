@@ -24,7 +24,7 @@ export const ipcEnsureDirectory: (dirPath: string, allowCreate?: boolean) => Pro
 export async function ipcSaveSettings<K extends keyof ISymLinkSettings>(_: Electron.IpcMainInvokeEvent, key: K, value: ISymLinkSettings[K]) {
   const settingsPath = path.join(app.getPath('appData'), symLinkAppDataFolderName, symLinkSettingsFileName);
   await ipcEnsureDirectory(path.dirname(settingsPath), true);
-  const settingsObj: ISymLinkSettings = JSON.parse(await readFile(settingsPath, 'utf-8')) || {};
+  const settingsObj: ISymLinkSettings = JSON.parse(await readFile(settingsPath, 'utf-8').catch(() => '{}'));
   settingsObj[key] = value;
   await writeFile(settingsPath, JSON.stringify(settingsObj, null, 2));
 }
