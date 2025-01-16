@@ -10,6 +10,8 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
 
   const menuRef = useRef<HTMLDetailsElement>(null);
   const modalRef = useRef<HTMLDialogElement>(null);
+  const menuListRef = useRef<HTMLUListElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
 
   const syncStatus =
     filesSynced.length === linkedFiles.length
@@ -42,13 +44,24 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
   };
 
   const onDropdownBlur = () =>
-    setTimeout(() => {
-      if (menuRef.current) menuRef.current.open = false;
-    }, 1000);
+    // set the visibility of the menuRef to hidden
+    {
+      if (menuListRef.current) menuListRef.current.style.opacity = '0';
+
+      timeoutRef.current = setTimeout(() => {
+        if (menuRef.current) menuRef.current.open = false;
+        if (menuListRef.current) menuListRef.current.style.opacity = '1';
+      }, 1000);
+    };
+
+    const onMenuOpen = () => {
+      if (menuListRef.current) menuListRef.current.style.opacity = '1';
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
 
   return (
     <>
-      <details className="dropdown dropdown-bottom dropdown-end" ref={menuRef} onBlur={onDropdownBlur}>
+      <details className="dropdown dropdown-bottom dropdown-end" ref={menuRef} onBlur={onDropdownBlur} onClick={onMenuOpen}>
         <summary className="flex items-center bg-base-200 gap-3 p-2 rounded-md hover:bg-base-300" tabIndex={0} role="button">
           <div className="avatar size-14 bg-base-300 mask mask-squircle">
             <div>
@@ -79,7 +92,7 @@ export const LinkedFileInfo: FC<{ linkedFile: LinkedFolder | string }> = ({ link
             </div>
           </div>
         </summary>
-        <ul tabIndex={0} className="dropdown-content menu bg-base-300 rounded-md z-[1] w-52 p-2 shadow">
+        <ul tabIndex={0} className="dropdown-content menu bg-base-300 rounded-md z-[1] w-52 p-2 shadow" ref={menuListRef}>
           {/* <li>
             <button onClick={refreshLinks}>Refresh</button>
           </li> */}
