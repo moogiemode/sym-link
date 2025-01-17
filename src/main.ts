@@ -10,7 +10,9 @@ export const symLinkSettingsFileName = 'settings.json';
 
 const isDev = process.env.NODE_ENV === 'development';
 
+const iconPath = isDev ? path.join(process.cwd(), 'src/images/icon.ico') : path.join(__dirname, 'src/images/icon.ico');
 
+console.log(path.join(process.cwd(), 'src/images/icon.ico'));
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
@@ -21,7 +23,7 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: path.resolve(__dirname, 'src/images/icon'),
+    icon: iconPath,
     autoHideMenuBar: !isDev,
     webPreferences: {
       contextIsolation: true,
