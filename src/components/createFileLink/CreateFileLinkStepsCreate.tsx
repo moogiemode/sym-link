@@ -52,7 +52,7 @@ export const CreateFileLinkStepsCreate: FC<CreateFileLinkStepsCreateProps> = ({ 
               </div>
             </div>
             <button className="btn btn-accent" onClick={handleCreateFileLinks}>
-              Create Link
+              {`Create ${filesToLink?.length} Link${filesToLink?.length === 1 ? '' : 's'}`}
             </button>
           </>
         ) : (
