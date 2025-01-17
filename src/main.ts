@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
 import path from 'path';
 import { readdir, readlink, symlink, writeFile } from 'fs/promises';
 import started from 'electron-squirrel-startup';
@@ -7,6 +7,9 @@ import { ipcAddSymlinks, ipcDeleteLinkInfo, ipcEnsureDirectory, ipcGetLinkInfo, 
 
 export const symLinkAppDataFolderName = 'SymLink';
 export const symLinkSettingsFileName = 'settings.json';
+
+const isDev = process.env.NODE_ENV === 'development';
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -18,6 +21,8 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: path.resolve(__dirname, 'src/images/icon'),
+    autoHideMenuBar: !isDev,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -91,7 +96,11 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (isDev) mainWindow.webContents.openDevTools();
+
+  if (!isDev) Menu.setApplicationMenu(null);
+
+
 };
 
 // This method will be called when Electron has finished
